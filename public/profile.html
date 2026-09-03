@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Profil — Dream Love</title>
+<meta name="theme-color" content="#ff4458" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body>
+  <div id="page-loader" class="page-loader"><div class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</div></div>
+
+  <div class="container profile-page-container" id="profile-page-root" style="display:none">
+    <div class="top-bar">
+      <button type="button" class="back-btn" id="profile-page-back"><i class="fa-solid fa-arrow-left"></i></button>
+      <a href="/app" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <span style="width:34px"></span>
+    </div>
+
+    <div class="profile-page-content" id="profile-page-content"></div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/sw-register.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const userId = params.get('id');
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    document.getElementById('profile-page-back').addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/app';
+      }
+    });
+
+    let photos = [];
+    let index = 0;
+
+    function renderPhoto() {
+      const wrap = document.getElementById('pp-photo-wrap');
+      if (!wrap) return;
+      const img = wrap.querySelector('img');
+      img.src = photos[index] || '/img/default-avatar.svg';
+      wrap.querySelectorAll('.photo-dots span').forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    function navigatePhoto(dir) {
+      if (photos.length <= 1) return;
+      index = Math.max(0, Math.min(photos.length - 1, index + dir));
+      renderPhoto();
+    }
+
+    async function loadProfile() {
+      const content = document.getElementById('profile-page-content');
+      if (!userId) {
+        content.innerHTML = `<div class="empty-state"><p>Profil introuvable.</p></div>`;
+        return;
+      }
+      content.innerHTML = '<div style="padding:80px 0"><div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(255,68,88,0.2)"></div></div>';
+
+      try {
+        const { user } = await api.get(`/api/users/${userId}`);
+        photos = user.photos && user.photos.length ? user.photos : ['/img/default-avatar.svg'];
+        index = user.mainPhotoIndex && user.mainPhotoIndex < photos.length ? user.mainPhotoIndex : 0;
+
+        const dots = photos.map((_, i) => `<span class="${i === index ? 'active' : ''}"></span>`).join('');
+        const locationParts = [user.location, user.country].filter(Boolean).join(', ');
+        const interestsHtml = (user.interests || []).map((i) => `<span>${escapeHtml(i)}</span>`).join('');
+        const hasMultiplePhotos = photos.length > 1;
+
+        content.innerHTML = `
+          <div class="pd-photo-wrap pp-photo-wrap" id="pp-photo-wrap">
+            <img src="${photos[index]}" alt="${escapeHtml(user.name)}" />
+            ${hasMultiplePhotos ? `<div class="photo-dots">${dots}</div>` : ''}
+            <div class="tap-zone left" id="pp-prev"></div>
+            <div class="tap-zone right" id="pp-next"></div>
+            ${hasMultiplePhotos ? `
+              <button type="button" class="pd-arrow pd-arrow-left" id="pp-prev-btn" aria-label="Photo précédente"><i class="fa-solid fa-chevron-left"></i></button>
+              <button type="button" class="pd-arrow pd-arrow-right" id="pp-next-btn" aria-label="Photo suivante"><i class="fa-solid fa-chevron-right"></i></button>
+            ` : ''}
+          </div>
+          <div class="pd-info">
+            <h2>${escapeHtml(user.name)}, ${user.age} ${user.verified ? verifiedBadgeHTML() : ''}</h2>
+            ${locationParts ? `<div class="pd-location"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(locationParts)}</div>` : ''}
+            ${user.distanceKm != null ? `<div class="pd-location"><i class="fa-solid fa-location-arrow"></i> À ${user.distanceKm} km</div>` : ''}
+            ${user.originCountry ? `<div class="pd-location">${countryFlagEmoji(user.originCountry)} Origine : ${escapeHtml(user.originCountry)}</div>` : ''}
+            ${user.relationshipStatus ? `<div class="pd-location"><i class="fa-solid fa-heart-circle-check"></i> ${escapeHtml(relationshipStatusLabel(user.relationshipStatus))}</div>` : ''}
+            ${user.bio ? `<div class="pd-bio">${escapeHtml(user.bio)}</div>` : ''}
+            ${interestsHtml ? `<div class="interest-chips">${interestsHtml}</div>` : ''}
+          </div>
+        `;
+
+        document.getElementById('pp-prev').addEventListener('click', () => navigatePhoto(-1));
+        document.getElementById('pp-next').addEventListener('click', () => navigatePhoto(1));
+        if (hasMultiplePhotos) {
+          document.getElementById('pp-prev-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigatePhoto(-1);
+          });
+          document.getElementById('pp-next-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigatePhoto(1);
+          });
+        }
+      } catch (err) {
+        content.innerHTML = `<div class="empty-state"><p>${escapeHtml(err.message)}</p></div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await api.get('/api/auth/me');
+      } catch (err) {
+        window.location.href = '/login.html';
+        return;
+      }
+      document.getElementById('page-loader').style.display = 'none';
+      document.getElementById('profile-page-root').style.display = 'block';
+      loadProfile();
+    });
+  </script>
+</body>
+</html>

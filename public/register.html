@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Inscription — Dream Love</title>
+<meta name="theme-color" content="#ff4458" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="auth-wrap">
+      <a href="/" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <p class="auth-sub" id="step-sub">Créez votre profil en 1 minute</p>
+
+      <!-- ETAPE 1 : INFOS -->
+      <div class="auth-card" id="step1-card">
+        <div class="error-msg" id="error-msg"></div>
+        <form id="register-form">
+          <div class="field">
+            <label>Prénom</label>
+            <input type="text" name="name" required maxlength="40" />
+          </div>
+          <div class="field">
+            <label>Adresse email</label>
+            <input type="email" name="email" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <input type="password" name="password" required minlength="6" autocomplete="new-password" />
+          </div>
+          <div class="field">
+            <label>Date de naissance</label>
+            <input type="date" name="birthdate" required />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Je suis</label>
+              <select name="gender" required>
+                <option value="">Choisir</option>
+                <option value="homme">Un homme</option>
+                <option value="femme">Une femme</option>
+                <option value="autre">Autre</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Je recherche</label>
+              <select name="seeking" required>
+                <option value="">Choisir</option>
+                <option value="homme">Des hommes</option>
+                <option value="femme">Des femmes</option>
+                <option value="tous">Tout le monde</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Pays de résidence</label>
+              <select name="country" id="country-select" required>
+                <option value="">Choisir un pays</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Ville de résidence</label>
+              <div id="city-host" data-field-id="city-input" data-field-name="location"></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Pays d'origine</label>
+            <select name="originCountry" id="origin-country-select">
+              <option value="">Choisir un pays</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Situation sentimentale</label>
+            <select name="relationshipStatus">
+              <option value="celibataire">Célibataire</option>
+              <option value="en_couple">En couple</option>
+              <option value="fiance">Fiancé(e)</option>
+              <option value="marie">Marié(e)</option>
+              <option value="divorce">Divorcé(e)</option>
+              <option value="veuf">Veuf / Veuve</option>
+              <option value="complique">C'est compliqué</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Tranche d'âge préférée pour vos rencontres</label>
+            <div class="age-range">
+              <input type="number" name="preferredAgeMin" id="pref-age-min" min="18" max="99" value="18" />
+              <span>—</span>
+              <input type="number" name="preferredAgeMax" id="pref-age-max" min="18" max="99" value="45" />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Continuer</button>
+        </form>
+      </div>
+
+      <!-- ETAPE 2 : PHOTO OBLIGATOIRE -->
+      <div class="auth-card" id="step2-card" style="display:none">
+        <p style="margin-top:0;color:var(--text-muted);font-size:13px;">
+          Ajoutez au moins une photo pour que les autres membres puissent vous découvrir.
+          Vous pouvez utiliser votre galerie ou la caméra.
+        </p>
+        <div class="photo-slots-row">
+          <div class="upload-slot" data-slot="0">
+            <span>Photo principale *</span>
+            <input type="file" accept="image/*" data-file-input="0" />
+            <button type="button" class="camera-btn" data-camera="0"><i class="fa-solid fa-camera"></i> Caméra</button>
+          </div>
+          <div class="upload-slot" data-slot="1">
+            <span>Deuxième photo (optionnel)</span>
+            <input type="file" accept="image/*" data-file-input="1" />
+            <button type="button" class="camera-btn" data-camera="1"><i class="fa-solid fa-camera"></i> Caméra</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="finish-btn" disabled>Terminer mon inscription</button>
+      </div>
+
+      <div class="auth-switch">
+        Déjà inscrit ? <a href="/login.html" style="color:var(--brand-1); font-weight:700;">Connectez-vous</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/numberInputFix.js"></script>
+  <script src="/js/countries.js"></script>
+  <script src="/js/cities.js"></script>
+  <script src="/js/camera.js"></script>
+  <script>
+    const countrySelect = document.getElementById('country-select');
+    const originSelect = document.getElementById('origin-country-select');
+    [countrySelect, originSelect].forEach((select) => {
+      COUNTRIES.forEach((c) => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        select.appendChild(opt);
+      });
+    });
+
+    const cityHost = document.getElementById('city-host');
+    renderCityField(cityHost, '', '');
+    countrySelect.addEventListener('change', () => {
+      renderCityField(cityHost, countrySelect.value, '');
+    });
+
+    // Prefill from the landing page search, if any
+    try {
+      const saved = JSON.parse(localStorage.getItem('dl_search') || 'null');
+      if (saved) {
+        if (saved.country) {
+          countrySelect.value = saved.country;
+          renderCityField(cityHost, saved.country, saved.city || '');
+        }
+        if (saved.minAge) document.getElementById('pref-age-min').value = saved.minAge;
+        if (saved.maxAge) document.getElementById('pref-age-max').value = saved.maxAge;
+        const seekingField = document.querySelector('select[name="seeking"]');
+        if (saved.seeking) seekingField.value = saved.seeking;
+      }
+    } catch (err) {
+      /* ignore malformed local storage */
+    }
+
+    const form = document.getElementById('register-form');
+    const errorMsg = document.getElementById('error-msg');
+    const submitBtn = document.getElementById('submit-btn');
+    const pendingPhotos = {};
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.classList.remove('show');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Création...';
+      const fd = new FormData(form);
+      try {
+        await api.post('/api/auth/register', {
+          name: fd.get('name'),
+          email: fd.get('email'),
+          password: fd.get('password'),
+          birthdate: fd.get('birthdate'),
+          gender: fd.get('gender'),
+          seeking: fd.get('seeking'),
+          country: fd.get('country'),
+          location: getCityFieldValue(cityHost),
+          originCountry: fd.get('originCountry'),
+          relationshipStatus: fd.get('relationshipStatus'),
+          preferredAgeMin: fd.get('preferredAgeMin'),
+          preferredAgeMax: fd.get('preferredAgeMax'),
+        });
+        document.getElementById('step1-card').style.display = 'none';
+        document.getElementById('step2-card').style.display = 'block';
+        document.getElementById('step-sub').textContent = 'Dernière étape : votre photo';
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Continuer';
+      }
+    });
+
+    function setPreview(slot, url) {
+      const box = document.querySelector(`.upload-slot[data-slot="${slot}"]`);
+      let img = box.querySelector('img');
+      if (!img) {
+        img = document.createElement('img');
+        box.prepend(img);
+      }
+      img.src = url;
+    }
+
+    function updateFinishState() {
+      document.getElementById('finish-btn').disabled = !pendingPhotos[0];
+    }
+
+    document.querySelectorAll('[data-file-input]').forEach((input) => {
+      input.addEventListener('change', (e) => {
+        const slot = input.dataset.fileInput;
+        if (e.target.files[0]) {
+          pendingPhotos[slot] = e.target.files[0];
+          setPreview(slot, URL.createObjectURL(e.target.files[0]));
+          updateFinishState();
+        }
+      });
+    });
+    document.querySelectorAll('[data-camera]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        Camera.open((blob) => {
+          const slot = btn.dataset.camera;
+          pendingPhotos[slot] = blob;
+          setPreview(slot, URL.createObjectURL(blob));
+          updateFinishState();
+        });
+      });
+    });
+
+    document.getElementById('finish-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('finish-btn');
+      btn.disabled = true;
+      btn.textContent = 'Envoi en cours...';
+      try {
+        for (const slot of Object.keys(pendingPhotos)) {
+          const fd = new FormData();
+          fd.append('photo', pendingPhotos[slot], 'photo.jpg');
+          await api.post('/api/profile/photo', fd, true);
+        }
+        window.location.href = '/app';
+      } catch (err) {
+        showToast(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Terminer mon inscription';
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

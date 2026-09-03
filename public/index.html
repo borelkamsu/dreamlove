@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dream Love — Rencontrez, matchez, aimez</title>
+<meta name="description" content="Dream Love, l'application de rencontre qui certifie ses profils pour des rencontres en toute confiance." />
+<meta name="theme-color" content="#ff4458" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <clipPath id="dl-heart-clip" clipPathUnits="objectBoundingBox">
+        <path d="M0.5,1.0 C0.5,1.0 0,0.65625 0,0.34375 C0,0.15625 0.15625,0 0.325,0 C0.41875,0 0.5,0.0625 0.5,0.15625 C0.5,0.0625 0.58125,0 0.675,0 C0.84375,0 1,0.15625 1,0.34375 C1,0.65625 0.5,1.0 0.5,1.0 Z" />
+      </clipPath>
+    </defs>
+  </svg>
+
+  <header class="landing-header" id="landing-header">
+    <div class="landing-header-inner">
+      <a href="/" class="brand-logo"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <nav class="landing-nav">
+        <a href="#comment-ca-marche">Comment ça marche</a>
+        <a href="#securite">Sécurité</a>
+        <a href="#temoignages">Témoignages</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a href="/login.html" class="landing-login-link">Se connecter</a>
+    </div>
+  </header>
+
+  <main class="landing-main">
+    <div class="landing-copy">
+      <div class="landing-hero-photos">
+        <img src="/img/hero-woman.jpg" alt="" class="hero-photo hero-photo-woman" />
+        <img src="/img/hero-man.jpg" alt="" class="hero-photo hero-photo-man" />
+      </div>
+      <h1>Derrière tout grand homme se cache une grande sœur</h1>
+      <p class="landing-slogan">Parce que les grandes sœurs ne dérangent pas</p>
+    </div>
+
+    <form class="landing-search-card" id="landing-search-form">
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Je souhaite rencontrer</label>
+          <select id="ls-seeking" name="seeking">
+            <option value="homme">Des hommes</option>
+            <option value="femme">Des femmes</option>
+            <option value="tous">Tout le monde</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>Pays de résidence</label>
+          <select id="ls-country" name="country">
+            <option value="">Choisir un pays</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Ville de résidence</label>
+          <div id="ls-city-host" data-field-id="ls-city" data-field-name="city"></div>
+        </div>
+        <div class="filter-field">
+          <label>Tranche d'âge</label>
+          <div class="age-range">
+            <input type="number" id="ls-age-min" min="18" max="99" value="18" />
+            <span>—</span>
+            <input type="number" id="ls-age-max" min="18" max="99" value="45" />
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Trouver mes profils</button>
+    </form>
+
+    <div class="landing-trust-row">
+      <span><i class="fa-solid fa-circle-check"></i> Profils certifiés</span>
+      <span><i class="fa-solid fa-comments"></i> Messagerie sécurisée</span>
+      <span><i class="fa-solid fa-lock"></i> Vos données protégées</span>
+    </div>
+
+    <p class="landing-alt-link">
+      Vous avez déjà un compte ? <a href="/login.html">Se connecter</a> ·
+      <a href="/register.html">Créer un compte directement</a>
+    </p>
+  </main>
+
+  <!-- POURQUOI NOUS CHOISIR -->
+  <section class="landing-section">
+    <h2 class="landing-section-title">Pourquoi choisir Dream Love</h2>
+    <p class="landing-section-sub">Une expérience de rencontre pensée pour aller à l'essentiel.</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <h3>Rencontres ciblées</h3>
+        <p>Filtrez par pays, ville et tranche d'âge pour ne voir que des profils qui correspondent vraiment à ce que vous cherchez.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-earth-americas"></i></div>
+        <h3>Communauté internationale</h3>
+        <p>Retrouvez des célibataires francophones du monde entier, y compris ceux qui partagent votre pays d'origine.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <h3>Sécurité avant tout</h3>
+        <p>Chaque demande de certification est vérifiée par notre équipe avant l'attribution du badge <i class="fa-solid fa-circle-check"></i> sur un profil.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <h3>Application intuitive</h3>
+        <p>Une interface pensée pour aller vite, installable comme une application sur votre téléphone ou votre ordinateur.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMENT CA MARCHE -->
+  <section class="landing-section landing-section-alt" id="comment-ca-marche">
+    <h2 class="landing-section-title">Comment ça marche</h2>
+    <p class="landing-section-sub">Cinq étapes pour passer de l'inscription à la première rencontre.</p>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">1</div><h3>Créez votre profil</h3><p>Renseignez vos informations et ajoutez votre photo en quelques clics.</p></div>
+      <div class="step-card"><div class="step-num">2</div><h3>Certifiez votre identité</h3><p>Envoyez une pièce d'identité et un selfie pour obtenir le badge vérifié.</p></div>
+      <div class="step-card"><div class="step-num">3</div><h3>Découvrez des profils</h3><p>Filtrez par pays, ville, âge et centres d'intérêt pour trouver les bons profils.</p></div>
+      <div class="step-card"><div class="step-num">4</div><h3>Likez et matchez</h3><p>Un like partagé déclenche un match instantané des deux côtés.</p></div>
+      <div class="step-card"><div class="step-num">5</div><h3>Discutez en direct</h3><p>Échangez en messagerie temps réel et donnez-vous rendez-vous.</p></div>
+    </div>
+  </section>
+
+  <!-- VOS RENCONTRES A VOTRE FACON -->
+  <section class="landing-section">
+    <h2 class="landing-section-title">Vos rencontres, à votre façon</h2>
+    <div class="feature-grid feature-grid-3">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-heart"></i></div>
+        <h3>Des centres d'intérêt qui rapprochent</h3>
+        <p>Cinéma, voyage, cuisine... indiquez ce qui vous passionne et repérez-le en un coup d'œil sur les profils.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-earth-americas"></i></div>
+        <h3>Retrouvez vos racines</h3>
+        <p>Indiquez votre pays d'origine et découvrez des célibataires qui partagent votre culture, où qu'ils vivent aujourd'hui.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
+        <h3>Présence en temps réel</h3>
+        <p>Voyez qui est en ligne, qui a vu vos messages, et discutez sans attendre grâce à notre messagerie instantanée.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITE -->
+  <section class="landing-section landing-section-alt" id="securite">
+    <h2 class="landing-section-title">Sécurité &amp; confiance</h2>
+    <div class="security-grid">
+      <div class="security-card">
+        <div class="feature-icon"><i class="fa-solid fa-lock"></i></div>
+        <h3>Un espace sûr et bienveillant</h3>
+        <p>Vérification d'identité, mots de passe chiffrés, connexions sécurisées : la confidentialité de vos données est une priorité.</p>
+      </div>
+      <div class="security-card">
+        <div class="feature-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3>Des profils vérifiés manuellement</h3>
+        <p>Chaque demande de certification (pièce d'identité + selfie) est examinée avec soin par notre équipe avant validation du badge.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEMOIGNAGES -->
+  <section class="landing-section" id="temoignages">
+    <h2 class="landing-section-title">Ils utilisent Dream Love</h2>
+    <p class="landing-section-sub">Quelques profils de notre communauté.</p>
+
+  </section>
+
+  <div class="heart-carousel" id="heart-carousel-1">
+    <button type="button" class="hc-arrow hc-prev" aria-label="Précédent"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="hc-heart"><img alt="" /></div>
+    <div class="hc-text">
+      <h3 class="hc-name"></h3>
+      <p class="hc-quote"></p>
+    </div>
+    <button type="button" class="hc-arrow hc-next" aria-label="Suivant"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- DIFFERENCIATION -->
+  <section class="landing-section landing-section-alt">
+    <div class="landing-split">
+      <div>
+        <h2 class="landing-section-title" style="text-align:left">Une expérience différente</h2>
+        <p>Dream Love ne se contente pas de vous mettre en relation au hasard. Nous vérifions les profils, mettons en avant vos origines et vos centres d'intérêt, et vous laissons filtrer précisément selon vos critères plutôt que de vous noyer dans des profils qui ne vous correspondent pas.</p>
+      </div>
+      <div>
+        <h2 class="landing-section-title" style="text-align:left">L'amour ne connaît pas de frontières</h2>
+        <p>Que vous viviez dans votre pays d'origine ou en diaspora, Dream Love vous aide à retrouver des célibataires qui partagent votre culture et votre langue, où qu'ils se trouvent dans le monde.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="landing-cta">
+    <h2>Prêt à rencontrer votre âme sœur ?</h2>
+    <p>Rejoignez la communauté Dream Love, c'est gratuit et ça ne prend qu'une minute.</p>
+    <a href="/register.html" class="btn btn-primary">Créer mon compte</a>
+  </section>
+
+  <!-- FAQ -->
+  <section class="landing-section" id="faq">
+    <h2 class="landing-section-title">Questions fréquentes</h2>
+    <div class="faq-list">
+      <details>
+        <summary>Dream Love est-il gratuit ?</summary>
+        <p>Oui, la création de compte, la découverte de profils et la messagerie sont entièrement gratuites.</p>
+      </details>
+      <details>
+        <summary>Comment fonctionne la certification de profil ?</summary>
+        <p>Depuis vos paramètres, envoyez le recto et le verso d'une pièce d'identité ainsi qu'une photo de vous (galerie ou caméra). Notre équipe vérifie la demande et active le badge <i class="fa-solid fa-circle-check"></i> sur votre profil.</p>
+      </details>
+      <details>
+        <summary>Puis-je filtrer les profils selon mon pays d'origine ?</summary>
+        <p>Vous pouvez indiquer votre pays de résidence et votre pays d'origine sur votre profil, et filtrer la découverte par pays et ville de résidence.</p>
+      </details>
+      <details>
+        <summary>Comment fonctionne le système de match ?</summary>
+        <p>Quand deux personnes se likent mutuellement, un match est créé automatiquement et une conversation s'ouvre pour échanger en temps réel.</p>
+      </details>
+      <details>
+        <summary>Mes données sont-elles protégées ?</summary>
+        <p>Vos mots de passe sont chiffrés et vos échanges passent par une connexion sécurisée. Vos documents de certification ne sont utilisés que pour la vérification de votre identité.</p>
+      </details>
+      <details>
+        <summary>Puis-je installer Dream Love comme une application ?</summary>
+        <p>Oui, Dream Love est une application web progressive (PWA) : vous pouvez l'installer sur l'écran d'accueil de votre téléphone ou de votre ordinateur depuis votre navigateur.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer class="landing-footer">
+    <a href="/" class="brand-logo"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+    <nav class="landing-footer-links">
+      <a href="/">Accueil</a>
+      <a href="/login.html">Se connecter</a>
+      <a href="/register.html">Créer un compte</a>
+      <a href="#comment-ca-marche">Comment ça marche</a>
+      <a href="#securite">Sécurité</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <p>© 2026 Dream Love. Tous droits réservés.</p>
+  </footer>
+
+  <script src="/js/numberInputFix.js"></script>
+  <script src="/js/countries.js"></script>
+  <script src="/js/cities.js"></script>
+  <script>
+    const countrySelect = document.getElementById('ls-country');
+    COUNTRIES.forEach((c) => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      countrySelect.appendChild(opt);
+    });
+
+    const cityHost = document.getElementById('ls-city-host');
+    renderCityField(cityHost, '', '');
+
+    countrySelect.addEventListener('change', () => {
+      renderCityField(cityHost, countrySelect.value, '');
+    });
+
+    document.getElementById('landing-search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const criteria = {
+        seeking: document.getElementById('ls-seeking').value,
+        country: countrySelect.value,
+        city: getCityFieldValue(cityHost),
+        minAge: document.getElementById('ls-age-min').value,
+        maxAge: document.getElementById('ls-age-max').value,
+      };
+      try {
+        localStorage.setItem('dl_search', JSON.stringify(criteria));
+      } catch (err) {
+        /* localStorage unavailable, continue without prefill */
+      }
+      window.location.href = '/register.html';
+    });
+
+    const HERO_TESTIMONIALS = [
+      {
+        name: 'Emma, 26 — Paris',
+        quote: "J'apprécie de pouvoir filtrer par pays et par ville, ça change tout quand on cherche quelqu'un près de chez soi.",
+        photo: 'https://res.cloudinary.com/dh8x3myg4/image/upload/v1788379392/dreamlove/photos/6a9880ff63113229e0c7fa60_seed.jpg',
+      },
+      {
+        name: 'Lucas, 29 — Lyon',
+        quote: 'Le badge certifié me met en confiance : on sait vraiment à qui on parle.',
+        photo: 'https://res.cloudinary.com/dh8x3myg4/image/upload/v1788379394/dreamlove/photos/6a98810163113229e0c7fa63_seed.jpg',
+      },
+      {
+        name: 'Chloé, 24 — Marseille',
+        quote: "J'ai trouvé plusieurs profils qui partagent mes centres d'intérêt dès les premiers jours.",
+        photo: 'https://res.cloudinary.com/dh8x3myg4/image/upload/v1788379395/dreamlove/photos/6a98810363113229e0c7fa66_seed.jpg',
+      },
+      {
+        name: 'Nathan, 31 — Bordeaux',
+        quote: 'Retrouver des profils qui partagent mes origines, c\'était exactement ce que je cherchais.',
+        photo: 'https://res.cloudinary.com/dh8x3myg4/image/upload/v1788379397/dreamlove/photos/6a98810463113229e0c7fa69_seed.jpg',
+      },
+      {
+        name: 'Léa, 27 — Lille',
+        quote: 'Interface simple et rapide, exactement ce qu\'il me fallait.',
+        photo: 'https://res.cloudinary.com/dh8x3myg4/image/upload/v1788379399/dreamlove/photos/6a98810663113229e0c7fa6c_seed.jpg',
+      },
+    ];
+
+    function initHeartCarousel(rootId, startIndex) {
+      const root = document.getElementById(rootId);
+      if (!root) return;
+      const imgEl = root.querySelector('.hc-heart img');
+      const nameEl = root.querySelector('.hc-name');
+      const quoteEl = root.querySelector('.hc-quote');
+      let index = startIndex % HERO_TESTIMONIALS.length;
+      let timer;
+
+      function render() {
+        const t = HERO_TESTIMONIALS[index];
+        imgEl.src = t.photo;
+        imgEl.alt = t.name;
+        nameEl.textContent = t.name;
+        quoteEl.textContent = `"${t.quote}"`;
+      }
+      function go(dir) {
+        index = (index + dir + HERO_TESTIMONIALS.length) % HERO_TESTIMONIALS.length;
+        render();
+        resetTimer();
+      }
+      function resetTimer() {
+        clearInterval(timer);
+        timer = setInterval(() => go(1), 2000);
+      }
+      root.querySelector('.hc-prev').addEventListener('click', () => go(-1));
+      root.querySelector('.hc-next').addEventListener('click', () => go(1));
+      render();
+      resetTimer();
+    }
+
+    initHeartCarousel('heart-carousel-1', 0);
+
+    const landingHeader = document.getElementById('landing-header');
+    function onScroll() {
+      landingHeader.classList.toggle('scrolled', window.scrollY > 10);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

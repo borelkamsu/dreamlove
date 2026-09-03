@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Dream Love</title>
+<meta name="theme-color" content="#ff4458" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="apple-touch-icon" href="/icons/icon-192.png" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body>
+  <div id="page-loader" class="page-loader"><div class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</div></div>
+
+  <div class="container wide" id="app-root" style="display:none">
+    <nav class="app-nav" id="app-nav">
+      <div class="app-nav-brand">
+        <button type="button" class="app-nav-brand-btn" id="app-home-btn-desktop"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</button>
+        <button type="button" class="notif-bell-btn" id="notif-bell-btn-desktop" title="Notifications">
+          <i class="fa-solid fa-bell"></i><span class="badge" id="notif-badge-desktop" style="display:none">0</span>
+        </button>
+      </div>
+      <div class="app-nav-items">
+        <button class="nav-btn active" data-view="discover"><span class="icon"><i class="fa-solid fa-fire"></i></span><span class="nav-label">Découvrir</span></button>
+        <button class="nav-btn" data-view="messages"><span class="icon"><i class="fa-solid fa-comment"></i></span><span class="nav-label">Messages</span><span class="badge" id="unread-badge" style="display:none">0</span></button>
+        <button class="nav-btn" data-view="profile"><span class="icon"><i class="fa-solid fa-user"></i></span><span class="nav-label">Profil</span></button>
+      </div>
+      <div class="app-nav-user" id="app-nav-user">
+        <img class="avatar" id="top-bar-avatar" src="/img/default-avatar.svg" />
+        <span id="app-nav-name"></span>
+      </div>
+    </nav>
+
+    <div class="app-shell">
+      <div class="top-bar">
+        <button type="button" class="brand-logo brand-logo-btn" id="app-home-btn-mobile"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</button>
+        <button type="button" class="notif-bell-btn" id="notif-bell-btn-mobile" title="Notifications">
+          <i class="fa-solid fa-bell"></i><span class="badge" id="notif-badge-mobile" style="display:none">0</span>
+        </button>
+      </div>
+
+      <div class="main-content">
+        <!-- DECOUVRIR -->
+        <section class="view active" id="view-discover">
+          <div class="discover-header">
+            <div>
+              <h1 id="discover-greeting">Bonjour</h1>
+              <p>Découvrez des profils qui pourraient vous plaire</p>
+            </div>
+            <button type="button" class="filter-trigger-btn" id="open-filter-btn" title="Filtrer">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 4 20 4 14 12 14 19 10 21 10 12 4 4" /></svg>
+              <span class="badge" id="filter-active-badge" style="display:none">1</span>
+            </button>
+          </div>
+
+          <div class="card-stack-wrap">
+            <div class="stack-glow glow-1"></div>
+            <div class="stack-glow glow-2"></div>
+            <div class="card-stack" id="card-stack"></div>
+          </div>
+        </section>
+
+        <!-- MESSAGES -->
+        <section class="view" id="view-messages">
+          <div class="messages-layout" id="messages-layout">
+            <div class="matches-pane" id="matches-pane">
+              <div class="section-title">Vos matchs</div>
+              <div id="matches-list"></div>
+            </div>
+
+            <div class="chat-pane" id="chat-pane">
+              <div class="chat-empty-state" id="chat-empty-state">
+                <div class="icon"><i class="fa-solid fa-comments"></i></div>
+                <p>Sélectionnez une conversation pour commencer à discuter</p>
+              </div>
+              <div class="chat-content" id="chat-content" style="display:none">
+                <div class="chat-header">
+                  <button class="back-btn" id="chat-back"><i class="fa-solid fa-arrow-left"></i></button>
+                  <div class="chat-header-info" id="chat-header-info">
+                    <div class="avatar-wrap">
+                      <img class="avatar" id="chat-avatar" src="/img/default-avatar.svg" />
+                      <span class="presence-dot" id="chat-presence"></span>
+                    </div>
+                    <div>
+                      <div class="name-line" id="chat-name"></div>
+                      <div class="status-line" id="chat-status"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="chat-body" id="chat-body"></div>
+                <div class="chat-input-bar" id="chat-input-bar">
+                  <button type="button" id="emoji-toggle-btn" title="Émoticônes"><i class="fa-regular fa-face-smile"></i></button>
+                  <input type="text" id="chat-input" placeholder="Écrire un message..." maxlength="2000" />
+                  <button id="chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+                  <div class="emoji-picker" id="emoji-picker"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFIL -->
+        <section class="view" id="view-profile">
+          <div class="profile-header">
+            <img class="avatar" id="profile-avatar" src="/img/default-avatar.svg" />
+            <h2 id="profile-name"></h2>
+            <div id="profile-status-pill"></div>
+          </div>
+
+          <div class="section-title">Mes photos</div>
+          <div class="photo-grid" id="photo-grid"></div>
+
+          <div class="section-title">Mon profil</div>
+          <div class="auth-card">
+            <div class="field">
+              <label>Prénom</label>
+              <input type="text" id="edit-name" maxlength="40" />
+            </div>
+            <div class="field">
+              <label>Bio</label>
+              <textarea id="edit-bio" rows="3" maxlength="500"></textarea>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Pays de résidence</label>
+                <select id="edit-country"></select>
+              </div>
+              <div class="field">
+                <label>Ville de résidence</label>
+                <div id="edit-city-host" data-field-id="edit-location" data-field-name="location"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Pays d'origine</label>
+              <select id="edit-origin-country"></select>
+            </div>
+            <div class="field">
+              <label>Je recherche</label>
+              <select id="edit-seeking">
+                <option value="homme">Des hommes</option>
+                <option value="femme">Des femmes</option>
+                <option value="tous">Tout le monde</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Situation sentimentale</label>
+              <select id="edit-relationship-status">
+                <option value="celibataire">Célibataire</option>
+                <option value="en_couple">En couple</option>
+                <option value="fiance">Fiancé(e)</option>
+                <option value="marie">Marié(e)</option>
+                <option value="divorce">Divorcé(e)</option>
+                <option value="veuf">Veuf / Veuve</option>
+                <option value="complique">C'est compliqué</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Tranche d'âge préférée</label>
+              <div class="age-range">
+                <input type="number" id="edit-age-min" min="18" max="99" />
+                <span>—</span>
+                <input type="number" id="edit-age-max" min="18" max="99" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Distance maximale de recherche</label>
+              <select id="edit-max-distance">
+                <option value="">Illimitée</option>
+                <option value="10">10 km</option>
+                <option value="25">25 km</option>
+                <option value="50">50 km</option>
+                <option value="100">100 km</option>
+                <option value="200">200 km</option>
+              </select>
+              <p class="field-hint" id="edit-location-status" style="margin:6px 0 0;font-size:12px;color:var(--text-muted);"></p>
+            </div>
+            <button class="btn btn-primary" id="save-profile-btn">Enregistrer</button>
+          </div>
+
+          <div class="section-title">Mes centres d'intérêt</div>
+          <div class="auth-card">
+            <p style="margin-top:0;color:var(--text-muted);font-size:13px;">Sélectionnez ce qui vous ressemble (10 max).</p>
+            <div class="chip-select" id="interests-select"></div>
+            <button class="btn btn-primary" id="save-interests-btn" style="margin-top:14px;">Enregistrer mes centres d'intérêt</button>
+          </div>
+
+          <div class="section-title">Certification du compte</div>
+          <div class="auth-card" id="verify-card">
+            <!-- filled by profile.js -->
+          </div>
+
+          <div class="settings-list">
+            <div class="settings-item" id="logout-btn">
+              <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+              <span class="label">Se déconnecter</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCH MODAL -->
+  <div class="modal-overlay" id="match-modal">
+    <div class="match-modal">
+      <div class="match-avatars">
+        <img id="match-avatar-me" src="/img/default-avatar.svg" />
+        <img id="match-avatar-other" src="/img/default-avatar.svg" />
+      </div>
+      <h2>C'est un match !</h2>
+      <p id="match-text"></p>
+      <button class="btn btn-primary" id="match-say-hi">Envoyer un message</button>
+      <button class="btn-text" id="match-close">Continuer à découvrir</button>
+    </div>
+  </div>
+
+  <!-- FILTER MODAL -->
+  <div class="modal-overlay" id="filter-modal">
+    <div class="simple-modal filter-modal">
+      <button type="button" class="modal-close-btn" id="filter-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <h3>Filtrer les profils</h3>
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Pays de résidence</label>
+          <select id="filter-country">
+            <option value="">Tous les pays</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>Ville de résidence</label>
+          <div id="filter-city-host" data-field-id="filter-city" data-field-name="city"></div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Âge</label>
+          <div class="age-range">
+            <input type="number" id="filter-age-min" min="18" max="99" placeholder="18" />
+            <span>—</span>
+            <input type="number" id="filter-age-max" min="18" max="99" placeholder="99" />
+          </div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <div class="filter-field">
+          <label>Distance maximale</label>
+          <select id="filter-distance">
+            <option value="">Illimitée</option>
+            <option value="10">10 km</option>
+            <option value="25">25 km</option>
+            <option value="50">50 km</option>
+            <option value="100">100 km</option>
+            <option value="200">200 km</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label>Recherche libre</label>
+          <input type="text" id="filter-search" placeholder="Prénom, mot-clé..." />
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" id="filter-submit"><i class="fa-solid fa-magnifying-glass"></i> Trouver mes profils</button>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS MODAL -->
+  <div class="modal-overlay" id="notif-modal">
+    <div class="simple-modal notif-modal">
+      <button type="button" class="modal-close-btn" id="notif-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      <h3>Notifications</h3>
+      <div class="notif-tabs">
+        <button type="button" class="notif-tab active" data-tab="likes"><i class="fa-solid fa-heart"></i> Likes reçus<span class="notif-tab-count" id="likes-tab-count"></span></button>
+        <button type="button" class="notif-tab" data-tab="messages"><i class="fa-solid fa-comment"></i> Messages<span class="notif-tab-count" id="messages-tab-count"></span></button>
+      </div>
+      <div class="notif-panel" id="notif-panel-likes"></div>
+      <div class="notif-panel" id="notif-panel-messages" style="display:none"></div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/lastseen.js"></script>
+  <script src="/js/emojiList.js"></script>
+  <script src="/js/numberInputFix.js"></script>
+  <script src="/js/countries.js"></script>
+  <script src="/js/cities.js"></script>
+  <script src="/js/interests.js"></script>
+  <script src="/js/camera.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/notifications.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/matches.js"></script>
+  <script src="/js/chat.js"></script>
+  <script src="/js/profile.js"></script>
+  <script src="/js/sw-register.js"></script>
+</body>
+</html>

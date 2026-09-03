@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Administration — Dream Love</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/admin.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div class="admin-login-wrap" id="login-view">
+    <div class="admin-login-card">
+      <a href="/" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <div class="sub">Espace administrateur</div>
+      <div class="error-msg" id="login-error"></div>
+      <form id="admin-login-form">
+        <div class="field">
+          <label>Identifiant</label>
+          <input type="text" name="username" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" name="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn btn-primary" type="submit" id="login-submit">Se connecter</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="admin-shell" id="dashboard-view" style="display:none">
+    <aside class="sidebar">
+      <button type="button" class="brand-logo brand-logo-btn" id="admin-home-btn"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</button>
+      <nav>
+        <button class="nav-btn active" data-tab="overview"><i class="fa-solid fa-gauge-high"></i> Tableau de bord</button>
+        <button class="nav-btn" data-tab="users"><i class="fa-solid fa-users"></i> Utilisateurs</button>
+        <button class="nav-btn" data-tab="verifications"><i class="fa-solid fa-shield-halved"></i> Vérifications</button>
+        <button class="nav-btn" data-tab="matches"><i class="fa-solid fa-heart"></i> Matchs</button>
+      </nav>
+      <button class="logout-btn nav-btn" id="admin-logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+    </aside>
+
+    <main class="main-area">
+      <section class="tab-panel" id="tab-overview">
+        <h1>Tableau de bord</h1>
+        <div class="stat-cards" id="stat-cards"></div>
+        <div class="panel">
+          <div class="panel-header"><h2>Dernières vérifications en attente</h2></div>
+          <div id="overview-pending-list"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-users" style="display:none">
+        <h1>Utilisateurs</h1>
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Liste des utilisateurs</h2>
+            <div style="display:flex; gap:10px;">
+              <select class="search-input" id="status-filter">
+                <option value="">Tous les statuts</option>
+                <option value="none">Non certifié</option>
+                <option value="pending">En attente</option>
+                <option value="approved">Certifié</option>
+                <option value="rejected">Refusé</option>
+              </select>
+              <input class="search-input" type="text" id="user-search" placeholder="Rechercher nom ou email..." />
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Utilisateur</th>
+                  <th>Email</th>
+                  <th>Statut</th>
+                  <th>Présence</th>
+                  <th>Inscrit le</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="users-pagination"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-verifications" style="display:none">
+        <h1>Demandes de certification</h1>
+        <div id="verifications-list"></div>
+      </section>
+
+      <section class="tab-panel" id="tab-matches" style="display:none">
+        <h1>Matchs</h1>
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Total des matchs : <span id="matches-total-count">0</span></h2>
+          </div>
+          <div id="matches-list"></div>
+          <div class="pagination" id="matches-pagination"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script src="/js/admin/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+const INTERESTS = [
+  'Cinéma',
+  'Lecture',
+  'Voyage',
+  'Musique',
+  'Sport',
+  'Cuisine',
+  'Art',
+  'Photographie',
+  'Danse',
+  'Yoga',
+  'Nature & randonnée',
+  'Jeux vidéo',
+  'Mode',
+  'Technologie',
+  'Animaux',
+  'Fitness',
+  'Cafés & restaurants',
+  'Fêtes & soirées',
+  'Spiritualité',
+  'Bénévolat',
+];
+
+module.exports = { INTERESTS };

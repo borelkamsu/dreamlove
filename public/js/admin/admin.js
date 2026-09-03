@@ -1,0 +1,327 @@
+const adminApi = {
+  async request(method, url, body) {
+    const opts = { method, credentials: 'same-origin', headers: {} };
+    if (body) {
+      opts.headers['Content-Type'] = 'application/json';
+      opts.body = JSON.stringify(body);
+    }
+    const res = await fetch(url, opts);
+    let data = null;
+    try {
+      data = await res.json();
+    } catch (e) {}
+    if (!res.ok) {
+      const err = new Error((data && data.error) || 'Erreur');
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  },
+  get(url) { return this.request('GET', url); },
+  post(url, body) { return this.request('POST', url, body); },
+};
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function statusLabel(status) {
+  return { none: 'Non certifié', pending: 'En attente', approved: 'Certifié', rejected: 'Refusé' }[status] || status;
+}
+
+let usersState = { page: 1, search: '', status: '' };
+
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('show');
+}
+document.getElementById('lightbox').addEventListener('click', () => {
+  document.getElementById('lightbox').classList.remove('show');
+});
+
+async function loadStats() {
+  const stats = await adminApi.get('/api/admin/stats');
+  const cards = [
+    { label: 'Utilisateurs', num: stats.totalUsers },
+    { label: 'Comptes certifiés', num: stats.verifiedUsers },
+    { label: 'Vérifications en attente', num: stats.pendingVerifications },
+    { label: 'Matchs', num: stats.totalMatches },
+    { label: 'Messages échangés', num: stats.totalMessages },
+    { label: 'En ligne actuellement', num: stats.onlineNow },
+  ];
+  document.getElementById('stat-cards').innerHTML = cards
+    .map((c) => `<div class="stat-card"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>`)
+    .join('');
+}
+
+async function loadUsers() {
+  const params = new URLSearchParams({
+    page: usersState.page,
+    search: usersState.search,
+    status: usersState.status,
+  });
+  const { users, pages, page } = await adminApi.get(`/api/admin/users?${params.toString()}`);
+  const tbody = document.getElementById('users-tbody');
+  if (users.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-note">Aucun utilisateur trouvé</div></td></tr>`;
+  } else {
+    tbody.innerHTML = users
+      .map(
+        (u) => `
+      <tr data-id="${u.id}">
+        <td>
+          <div class="user-cell">
+            <img src="${u.photo || '/icons/icon-192.png'}" />
+            <span>${escapeHtml(u.name)} ${u.verified ? '<span class="verified-badge"><i class="fa-solid fa-check"></i></span>' : ''}</span>
+          </div>
+        </td>
+        <td>${escapeHtml(u.email)}</td>
+        <td><span class="badge-pill ${u.verificationStatus}">${statusLabel(u.verificationStatus)}</span></td>
+        <td><span class="badge-pill ${u.online ? 'online' : 'offline'}">${u.online ? 'En ligne' : 'Hors ligne'}</span></td>
+        <td>${fmtDate(u.createdAt)}</td>
+        <td class="actions-cell">
+          ${u.verificationStatus === 'approved'
+            ? `<button class="btn btn-sm btn-outline" data-unverify="${u.id}">Retirer certification</button>`
+            : `<button class="btn btn-sm btn-success" data-verify="${u.id}">Certifier</button>`}
+          ${u.isBanned
+            ? `<button class="btn btn-sm btn-outline" data-unban="${u.id}">Réactiver</button>`
+            : `<button class="btn btn-sm btn-danger" data-ban="${u.id}">Bannir</button>`}
+        </td>
+      </tr>`
+      )
+      .join('');
+  }
+
+  const pag = document.getElementById('users-pagination');
+  pag.innerHTML = '';
+  for (let i = 1; i <= pages; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    if (i === page) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      usersState.page = i;
+      loadUsers();
+    });
+    pag.appendChild(btn);
+  }
+
+  tbody.querySelectorAll('[data-verify]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      await adminApi.post(`/api/admin/users/${btn.dataset.verify}/verify`);
+      loadUsers();
+      loadStats();
+    })
+  );
+  tbody.querySelectorAll('[data-unverify]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      if (!confirm('Retirer la certification de cet utilisateur ?')) return;
+      await adminApi.post(`/api/admin/users/${btn.dataset.unverify}/unverify`);
+      loadUsers();
+      loadStats();
+    })
+  );
+  tbody.querySelectorAll('[data-ban]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      if (!confirm('Bannir cet utilisateur ?')) return;
+      await adminApi.post(`/api/admin/users/${btn.dataset.ban}/ban`);
+      loadUsers();
+    })
+  );
+  tbody.querySelectorAll('[data-unban]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      await adminApi.post(`/api/admin/users/${btn.dataset.unban}/unban`);
+      loadUsers();
+    })
+  );
+}
+
+function renderVerifCard(req) {
+  const div = document.createElement('div');
+  div.className = 'verif-card';
+  div.innerHTML = `
+    <div class="head">
+      <div><strong>${escapeHtml(req.name)}</strong><br/><span style="color:var(--text-muted);font-size:12px">${escapeHtml(req.email)}</span></div>
+      <span style="color:var(--text-muted);font-size:12px">${fmtDate(req.submittedAt)}</span>
+    </div>
+    <div class="verif-images">
+      <img src="${req.docs.idFront?.url}" data-full="${req.docs.idFront?.url}" alt="Recto" />
+      <img src="${req.docs.idBack?.url}" data-full="${req.docs.idBack?.url}" alt="Verso" />
+      <img src="${req.docs.selfie?.url}" data-full="${req.docs.selfie?.url}" alt="Selfie" />
+    </div>
+    <div class="verif-actions">
+      <button class="btn btn-sm btn-success" data-approve="${req.id}"><i class="fa-solid fa-check"></i> Approuver</button>
+      <button class="btn btn-sm btn-danger" data-reject="${req.id}"><i class="fa-solid fa-xmark"></i> Rejeter</button>
+    </div>
+  `;
+  div.querySelectorAll('img[data-full]').forEach((img) => {
+    img.addEventListener('click', () => openLightbox(img.dataset.full));
+  });
+  div.querySelector('[data-approve]').addEventListener('click', async () => {
+    await adminApi.post(`/api/admin/users/${req.id}/verify`);
+    loadVerifications();
+    loadStats();
+    loadOverviewPending();
+  });
+  div.querySelector('[data-reject]').addEventListener('click', async () => {
+    const reason = prompt('Raison du refus (visible par l\'utilisateur) :', 'Documents illisibles ou non conformes');
+    if (reason === null) return;
+    await adminApi.post(`/api/admin/users/${req.id}/reject`, { reason });
+    loadVerifications();
+    loadStats();
+    loadOverviewPending();
+  });
+  return div;
+}
+
+async function loadVerifications() {
+  const { requests } = await adminApi.get('/api/admin/verifications');
+  const host = document.getElementById('verifications-list');
+  host.innerHTML = '';
+  if (requests.length === 0) {
+    host.innerHTML = `<div class="panel"><div class="empty-note">Aucune demande en attente</div></div>`;
+    return;
+  }
+  requests.forEach((req) => host.appendChild(renderVerifCard(req)));
+}
+
+async function loadOverviewPending() {
+  const { requests } = await adminApi.get('/api/admin/verifications');
+  const host = document.getElementById('overview-pending-list');
+  host.innerHTML = '';
+  if (requests.length === 0) {
+    host.innerHTML = `<div class="empty-note">Aucune demande en attente</div>`;
+    return;
+  }
+  requests.slice(0, 3).forEach((req) => host.appendChild(renderVerifCard(req)));
+}
+
+let matchesState = { page: 1 };
+
+async function loadMatches() {
+  const params = new URLSearchParams({ page: matchesState.page });
+  const { matches, pages, page, total } = await adminApi.get(`/api/admin/matches?${params.toString()}`);
+  document.getElementById('matches-total-count').textContent = total;
+  const host = document.getElementById('matches-list');
+  if (matches.length === 0) {
+    host.innerHTML = `<div class="empty-note">Aucun match pour le moment</div>`;
+  } else {
+    host.innerHTML = matches
+      .map((m) => {
+        const [a, b] = m.users;
+        const userHtml = (u) =>
+          u
+            ? `<div class="match-user"><img src="${u.photo || '/icons/icon-192.png'}" /><span>${escapeHtml(u.name)} ${u.verified ? '<span class="verified-badge"><i class="fa-solid fa-check"></i></span>' : ''}</span></div>`
+            : `<div class="match-user"><span style="color:var(--text-muted)">Utilisateur supprimé</span></div>`;
+        return `
+      <div class="match-card">
+        <div class="match-users">
+          ${userHtml(a)}
+          <i class="fa-solid fa-heart match-heart"></i>
+          ${userHtml(b)}
+        </div>
+        <div class="match-date">${fmtDate(m.createdAt)}</div>
+      </div>`;
+      })
+      .join('');
+  }
+
+  const pag = document.getElementById('matches-pagination');
+  pag.innerHTML = '';
+  for (let i = 1; i <= pages; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    if (i === page) btn.classList.add('active');
+    btn.addEventListener('click', () => {
+      matchesState.page = i;
+      loadMatches();
+    });
+    pag.appendChild(btn);
+  }
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach((p) => (p.style.display = 'none'));
+  document.querySelectorAll('.sidebar .nav-btn').forEach((b) => b.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).style.display = 'block';
+  document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
+  if (tab === 'users') loadUsers();
+  if (tab === 'verifications') loadVerifications();
+  if (tab === 'matches') loadMatches();
+  if (tab === 'overview') { loadStats(); loadOverviewPending(); }
+}
+
+function initDashboard() {
+  document.querySelectorAll('.sidebar .nav-btn[data-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  const homeBtn = document.getElementById('admin-home-btn');
+  if (homeBtn) homeBtn.addEventListener('click', () => switchTab('overview'));
+  document.getElementById('admin-logout').addEventListener('click', async () => {
+    await adminApi.post('/api/admin/logout');
+    document.getElementById('dashboard-view').style.display = 'none';
+    document.getElementById('login-view').style.display = 'flex';
+  });
+  document.getElementById('user-search').addEventListener('input', debounce(() => {
+    usersState.search = document.getElementById('user-search').value;
+    usersState.page = 1;
+    loadUsers();
+  }, 350));
+  document.getElementById('status-filter').addEventListener('change', () => {
+    usersState.status = document.getElementById('status-filter').value;
+    usersState.page = 1;
+    loadUsers();
+  });
+
+  loadStats();
+  loadOverviewPending();
+}
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+}
+
+document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const errorMsg = document.getElementById('login-error');
+  errorMsg.classList.remove('show');
+  const submitBtn = document.getElementById('login-submit');
+  submitBtn.disabled = true;
+  const fd = new FormData(e.target);
+  try {
+    await adminApi.post('/api/admin/login', {
+      username: fd.get('username'),
+      password: fd.get('password'),
+    });
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('dashboard-view').style.display = 'flex';
+    initDashboard();
+  } catch (err) {
+    errorMsg.textContent = err.message;
+    errorMsg.classList.add('show');
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+(async function bootstrap() {
+  try {
+    const { isAdmin } = await adminApi.get('/api/admin/session');
+    if (isAdmin) {
+      document.getElementById('login-view').style.display = 'none';
+      document.getElementById('dashboard-view').style.display = 'flex';
+      initDashboard();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+})();

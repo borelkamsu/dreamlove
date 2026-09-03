@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Connexion — Dream Love</title>
+<meta name="theme-color" content="#ff4458" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" href="/icons/icon-192.png" />
+<link rel="stylesheet" href="/css/styles.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="auth-wrap">
+      <a href="/" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <p class="auth-sub">Ravi de vous revoir</p>
+      <div class="auth-card">
+        <div class="error-msg" id="error-msg"></div>
+        <form id="login-form">
+          <div class="field">
+            <label>Adresse email</label>
+            <input type="email" name="email" required autocomplete="email" />
+          </div>
+          <div class="field">
+            <label>Mot de passe</label>
+            <input type="password" name="password" required autocomplete="current-password" />
+          </div>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Se connecter</button>
+        </form>
+      </div>
+      <div class="auth-switch">
+        Pas encore de compte ? <a href="/register.html" style="color:var(--brand-1); font-weight:700;">Inscrivez-vous</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error-msg');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.classList.remove('show');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Connexion...';
+      const fd = new FormData(form);
+      try {
+        await api.post('/api/auth/login', {
+          email: fd.get('email'),
+          password: fd.get('password'),
+        });
+        window.location.href = '/app';
+      } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Se connecter';
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
