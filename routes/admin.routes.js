@@ -3,6 +3,7 @@ const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const AdminMessage = require('../models/AdminMessage');
 const { requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
@@ -98,6 +99,8 @@ router.post('/users/:id/verify', requireAdmin, async (req, res) => {
     { new: true }
   );
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  const io = req.app.get('io');
+  if (io) io.to(`user:${user._id}`).emit('verification:update', { status: 'approved', verified: true, reason: '' });
   res.json({ ok: true });
 });
 
@@ -108,6 +111,8 @@ router.post('/users/:id/unverify', requireAdmin, async (req, res) => {
     { new: true }
   );
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  const io = req.app.get('io');
+  if (io) io.to(`user:${user._id}`).emit('verification:update', { status: 'none', verified: false, reason: '' });
   res.json({ ok: true });
 });
 
@@ -119,6 +124,8 @@ router.post('/users/:id/reject', requireAdmin, async (req, res) => {
     { new: true }
   );
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  const io = req.app.get('io');
+  if (io) io.to(`user:${user._id}`).emit('verification:update', { status: 'rejected', verified: false, reason });
   res.json({ ok: true });
 });
 
@@ -131,6 +138,24 @@ router.post('/users/:id/ban', requireAdmin, async (req, res) => {
 router.post('/users/:id/unban', requireAdmin, async (req, res) => {
   const user = await User.findByIdAndUpdate(req.params.id, { isBanned: false }, { new: true });
   if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  res.json({ ok: true });
+});
+
+router.post('/users/:id/message', requireAdmin, async (req, res) => {
+  const message = (req.body.message || '').trim().slice(0, 1000);
+  if (!message) return res.status(400).json({ error: 'Message vide' });
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+
+  const doc = await AdminMessage.create({ user: user._id, message });
+  const io = req.app.get('io');
+  if (io) {
+    io.to(`user:${user._id}`).emit('admin:message', {
+      id: doc._id,
+      message: doc.message,
+      createdAt: doc.createdAt,
+    });
+  }
   res.json({ ok: true });
 });
 

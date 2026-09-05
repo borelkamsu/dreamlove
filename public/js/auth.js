@@ -82,6 +82,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.NotificationsModule) window.NotificationsModule.refreshSummary();
   });
 
+  socket.on('admin:message', () => {
+    showToast("Vous avez reçu un nouveau message de l'équipe Dream Love.");
+    if (window.NotificationsModule) window.NotificationsModule.refreshSummary();
+  });
+
+  socket.on('verification:update', ({ status, verified, reason }) => {
+    State.user.verified = verified;
+    if (status === 'approved') {
+      showToast('Votre compte a été certifié ! Le badge est maintenant visible sur votre profil.');
+    } else if (status === 'rejected') {
+      showToast(`Vérification refusée : ${reason || 'documents non conformes'}. Vous pouvez renvoyer vos documents.`);
+    } else if (status === 'none') {
+      showToast('Votre certification a été retirée par notre équipe.');
+    }
+    if (window.ProfileModule) window.ProfileModule.refresh();
+  });
+
   socket.on('typing', ({ conversationId, fromUserId }) => {
     if (window.ChatModule) window.ChatModule.onTyping(conversationId, fromUserId);
   });

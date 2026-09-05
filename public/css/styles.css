@@ -207,8 +207,17 @@ a.brand-logo, .brand-logo-btn {
   background: none;
   -webkit-text-fill-color: currentColor;
   color: #fff;
+  font-size: 24px;
+  flex-shrink: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.landing-login-link { font-weight: 700; color: #fff; font-size: 14px; }
+.landing-login-link { font-weight: 700; color: #fff; font-size: 14px; white-space: nowrap; flex-shrink: 0; }
+
+@media (min-width: 700px) {
+  .landing-header .brand-logo { font-size: 34px; }
+}
 .landing-main {
   min-height: 100vh;
   background: var(--brand-gradient);
@@ -799,6 +808,9 @@ a.brand-logo, .brand-logo-btn {
 .notif-item:last-child { border-bottom: none; }
 .notif-item-body { flex: 1; min-width: 0; }
 .notif-item .btn-icon { width: 40px; height: 40px; font-size: 17px; flex-shrink: 0; }
+.admin-msg-item { cursor: default; align-items: flex-start; }
+.admin-msg-item.unread { background: rgba(255,68,88,0.06); border-radius: 10px; }
+.admin-msg-text { margin: 4px 0; font-size: 13.5px; color: var(--text); line-height: 1.5; }
 
 .discover-filters {
   background: var(--surface);

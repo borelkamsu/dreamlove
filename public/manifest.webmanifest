@@ -2,7 +2,7 @@
   "name": "Dream Love",
   "short_name": "Dream Love",
   "description": "Dream Love — rencontrez des profils certifiés, matchez et échangez en toute confiance.",
-  "start_url": "/app",
+  "start_url": "/",
   "id": "/app",
   "scope": "/",
   "display": "standalone",

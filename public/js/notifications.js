@@ -20,16 +20,50 @@ const NotificationsModule = (() => {
 
   async function refreshSummary() {
     try {
-      const { likesCount, unreadCount } = await api.get('/api/notifications/summary');
-      const total = likesCount + unreadCount;
+      const { likesCount, unreadCount, adminMessagesCount } = await api.get('/api/notifications/summary');
+      const total = likesCount + unreadCount + adminMessagesCount;
       setBadge('notif-badge-mobile', total);
       setBadge('notif-badge-desktop', total);
       const likesTabCount = document.getElementById('likes-tab-count');
       const messagesTabCount = document.getElementById('messages-tab-count');
+      const adminTabCount = document.getElementById('admin-tab-count');
       likesTabCount.textContent = likesCount > 0 ? ` (${likesCount})` : '';
       messagesTabCount.textContent = unreadCount > 0 ? ` (${unreadCount})` : '';
+      adminTabCount.textContent = adminMessagesCount > 0 ? ` (${adminMessagesCount})` : '';
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  function fmtDate(d) {
+    return new Date(d).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function loadAdminPanel() {
+    const host = document.getElementById('notif-panel-admin');
+    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(255,68,88,0.2);margin:30px auto;"></div>';
+    try {
+      const { messages } = await api.get('/api/notifications/admin-messages');
+      if (messages.length === 0) {
+        renderEmpty(host, "Aucun message de l'équipe Dream Love pour le moment.");
+      } else {
+        host.innerHTML = messages
+          .map(
+            (m) => `
+          <div class="notif-item admin-msg-item ${m.read ? '' : 'unread'}">
+            <div class="notif-item-body">
+              <div class="match-row-name"><i class="fa-solid fa-bullhorn" style="color:var(--brand-1);margin-right:6px;"></i>Équipe Dream Love</div>
+              <p class="admin-msg-text">${escapeHtml(m.message)}</p>
+              <div class="match-row-sub">${fmtDate(m.createdAt)}</div>
+            </div>
+          </div>`
+          )
+          .join('');
+      }
+      await api.post('/api/notifications/admin-messages/read');
+      refreshSummary();
+    } catch (err) {
+      renderEmpty(host, err.message);
     }
   }
 
@@ -136,8 +170,10 @@ const NotificationsModule = (() => {
     document.querySelectorAll('.notif-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tab));
     document.getElementById('notif-panel-likes').style.display = tab === 'likes' ? 'block' : 'none';
     document.getElementById('notif-panel-messages').style.display = tab === 'messages' ? 'block' : 'none';
+    document.getElementById('notif-panel-admin').style.display = tab === 'admin' ? 'block' : 'none';
     if (tab === 'likes') loadLikesPanel();
-    else loadMessagesPanel();
+    else if (tab === 'messages') loadMessagesPanel();
+    else loadAdminPanel();
   }
 
   function openModal() {

@@ -92,6 +92,7 @@ async function loadUsers() {
           ${u.isBanned
             ? `<button class="btn btn-sm btn-outline" data-unban="${u.id}">Réactiver</button>`
             : `<button class="btn btn-sm btn-danger" data-ban="${u.id}">Bannir</button>`}
+          <button class="btn btn-sm btn-outline" data-message="${u.id}"><i class="fa-solid fa-message"></i> Message</button>
         </td>
       </tr>`
       )
@@ -139,6 +140,22 @@ async function loadUsers() {
       loadUsers();
     })
   );
+  tbody.querySelectorAll('[data-message]').forEach((btn) =>
+    btn.addEventListener('click', () => sendAdminMessage(btn.dataset.message))
+  );
+}
+
+async function sendAdminMessage(userId, defaultText) {
+  const message = prompt('Message à envoyer à cet utilisateur :', defaultText || '');
+  if (message === null) return;
+  const trimmed = message.trim();
+  if (!trimmed) return;
+  try {
+    await adminApi.post(`/api/admin/users/${userId}/message`, { message: trimmed });
+    alert('Message envoyé.');
+  } catch (err) {
+    alert(err.message);
+  }
 }
 
 function renderVerifCard(req) {
@@ -157,10 +174,14 @@ function renderVerifCard(req) {
     <div class="verif-actions">
       <button class="btn btn-sm btn-success" data-approve="${req.id}"><i class="fa-solid fa-check"></i> Approuver</button>
       <button class="btn btn-sm btn-danger" data-reject="${req.id}"><i class="fa-solid fa-xmark"></i> Rejeter</button>
+      <button class="btn btn-sm btn-outline" data-message="${req.id}"><i class="fa-solid fa-message"></i> Demander des pièces / Message</button>
     </div>
   `;
   div.querySelectorAll('img[data-full]').forEach((img) => {
     img.addEventListener('click', () => openLightbox(img.dataset.full));
+  });
+  div.querySelector('[data-message]').addEventListener('click', () => {
+    sendAdminMessage(req.id, 'Merci de renvoyer une photo plus nette de votre pièce d\'identité et de votre selfie.');
   });
   div.querySelector('[data-approve]').addEventListener('click', async () => {
     await adminApi.post(`/api/admin/users/${req.id}/verify`);
