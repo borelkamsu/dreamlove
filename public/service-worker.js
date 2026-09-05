@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dreamlove-v12';
+const CACHE_NAME = 'dreamlove-v13';
 const PRECACHE_URLS = [
   '/',
   '/index.html',

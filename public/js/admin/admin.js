@@ -75,16 +75,16 @@ async function loadUsers() {
       .map(
         (u) => `
       <tr data-id="${u.id}">
-        <td>
+        <td class="cell-user">
           <div class="user-cell">
             <img src="${u.photo || '/icons/icon-192.png'}" />
             <span>${escapeHtml(u.name)} ${u.verified ? '<span class="verified-badge"><i class="fa-solid fa-check"></i></span>' : ''}</span>
           </div>
         </td>
-        <td>${escapeHtml(u.email)}</td>
-        <td><span class="badge-pill ${u.verificationStatus}">${statusLabel(u.verificationStatus)}</span></td>
-        <td><span class="badge-pill ${u.online ? 'online' : 'offline'}">${u.online ? 'En ligne' : 'Hors ligne'}</span></td>
-        <td>${fmtDate(u.createdAt)}</td>
+        <td data-label="Email">${escapeHtml(u.email)}</td>
+        <td data-label="Statut"><span class="badge-pill ${u.verificationStatus}">${statusLabel(u.verificationStatus)}</span></td>
+        <td data-label="Présence"><span class="badge-pill ${u.online ? 'online' : 'offline'}">${u.online ? 'En ligne' : 'Hors ligne'}</span></td>
+        <td data-label="Inscrit le">${fmtDate(u.createdAt)}</td>
         <td class="actions-cell">
           ${u.verificationStatus === 'approved'
             ? `<button class="btn btn-sm btn-outline" data-unverify="${u.id}">Retirer certification</button>`
@@ -245,6 +245,13 @@ async function loadMatches() {
   }
 }
 
+function closeSidebar() {
+  const sidebar = document.getElementById('admin-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (sidebar) sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('show');
+}
+
 function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach((p) => (p.style.display = 'none'));
   document.querySelectorAll('.sidebar .nav-btn').forEach((b) => b.classList.remove('active'));
@@ -254,6 +261,7 @@ function switchTab(tab) {
   if (tab === 'verifications') loadVerifications();
   if (tab === 'matches') loadMatches();
   if (tab === 'overview') { loadStats(); loadOverviewPending(); }
+  closeSidebar();
 }
 
 function initDashboard() {
@@ -262,6 +270,18 @@ function initDashboard() {
   });
   const homeBtn = document.getElementById('admin-home-btn');
   if (homeBtn) homeBtn.addEventListener('click', () => switchTab('overview'));
+  const menuToggle = document.getElementById('admin-menu-toggle');
+  const sidebar = document.getElementById('admin-sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const sidebarCloseBtn = document.getElementById('sidebar-close-btn');
+  if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.add('open');
+      backdrop.classList.add('show');
+    });
+  }
+  if (backdrop) backdrop.addEventListener('click', closeSidebar);
+  if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
   document.getElementById('admin-logout').addEventListener('click', async () => {
     await adminApi.post('/api/admin/logout');
     document.getElementById('dashboard-view').style.display = 'none';

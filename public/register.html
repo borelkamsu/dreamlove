@@ -10,7 +10,19 @@
 <link rel="stylesheet" href="/css/styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
-<body>
+<body style="visibility:hidden">
+  <script src="/js/api.js"></script>
+  <script>
+    (async () => {
+      try {
+        await api.get('/api/auth/me');
+        window.location.replace('/app');
+        return;
+      } catch (err) {
+        document.body.style.visibility = 'visible';
+      }
+    })();
+  </script>
   <div class="container">
     <div class="auth-wrap">
       <a href="/" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
@@ -108,12 +120,17 @@
           <div class="upload-slot" data-slot="0">
             <span>Photo principale *</span>
             <input type="file" accept="image/*" data-file-input="0" />
-            <button type="button" class="camera-btn" data-camera="0"><i class="fa-solid fa-camera"></i> Caméra</button>
+            <div class="upload-slot-actions">
+              <button type="button" class="browse-btn" data-browse="0"><i class="fa-solid fa-image"></i> Parcourir</button>
+              <button type="button" class="camera-btn" data-camera="0"><i class="fa-solid fa-camera"></i> Caméra</button>
+            </div>
           </div>
           <div class="upload-slot" data-slot="1">
             <span>Deuxième photo (optionnel)</span>
             <input type="file" accept="image/*" data-file-input="1" />
-            <button type="button" class="camera-btn" data-camera="1"><i class="fa-solid fa-camera"></i> Caméra</button>
+            <div class="upload-slot-actions">
+              <button type="button" class="browse-btn" data-browse="1"><i class="fa-solid fa-image"></i> Parcourir</button>
+            </div>
           </div>
         </div>
         <button type="button" class="btn btn-primary" id="finish-btn" disabled>Terminer mon inscription</button>
@@ -125,7 +142,6 @@
     </div>
   </div>
 
-  <script src="/js/api.js"></script>
   <script src="/js/numberInputFix.js"></script>
   <script src="/js/countries.js"></script>
   <script src="/js/cities.js"></script>
@@ -216,6 +232,11 @@
       document.getElementById('finish-btn').disabled = !pendingPhotos[0];
     }
 
+    document.querySelectorAll('[data-browse]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelector(`[data-file-input="${btn.dataset.browse}"]`).click();
+      });
+    });
     document.querySelectorAll('[data-file-input]').forEach((input) => {
       input.addEventListener('change', (e) => {
         const slot = input.dataset.fileInput;

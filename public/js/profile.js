@@ -245,7 +245,10 @@ const ProfileModule = (() => {
         <div class="upload-slot" data-key="${key}">
           <span>${DOC_LABELS[key]}</span>
           <input type="file" accept="image/*" data-file-input="${key}" />
-          <button type="button" class="camera-btn" data-camera="${key}"><i class="fa-solid fa-camera"></i> Utiliser la caméra</button>
+          <div class="upload-slot-actions">
+            <button type="button" class="browse-btn" data-browse="${key}"><i class="fa-solid fa-image"></i> Parcourir</button>
+            <button type="button" class="camera-btn" data-camera="${key}"><i class="fa-solid fa-camera"></i> Utiliser la caméra</button>
+          </div>
         </div>`
         )
         .join('')}
@@ -255,6 +258,11 @@ const ProfileModule = (() => {
     card.querySelectorAll('[data-file-input]').forEach((input) => {
       input.addEventListener('change', (e) => {
         if (e.target.files[0]) setDoc(input.dataset.fileInput, e.target.files[0]);
+      });
+    });
+    card.querySelectorAll('[data-browse]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        card.querySelector(`[data-file-input="${btn.dataset.browse}"]`).click();
       });
     });
     card.querySelectorAll('[data-camera]').forEach((btn) => {

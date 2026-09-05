@@ -33,7 +33,13 @@
 
   <!-- DASHBOARD -->
   <div class="admin-shell" id="dashboard-view" style="display:none">
-    <aside class="sidebar">
+    <div class="mobile-topbar">
+      <button type="button" class="hamburger-btn" id="admin-menu-toggle" aria-label="Ouvrir le menu"><i class="fa-solid fa-bars"></i></button>
+      <span class="mobile-topbar-brand"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</span>
+    </div>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <aside class="sidebar" id="admin-sidebar">
+      <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
       <button type="button" class="brand-logo brand-logo-btn" id="admin-home-btn"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</button>
       <nav>
         <button class="nav-btn active" data-tab="overview"><i class="fa-solid fa-gauge-high"></i> Tableau de bord</button>

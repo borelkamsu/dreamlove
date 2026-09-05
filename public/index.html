@@ -12,7 +12,19 @@
 <link rel="stylesheet" href="/css/styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
-<body>
+<body style="visibility:hidden">
+  <script src="/js/api.js"></script>
+  <script>
+    (async () => {
+      try {
+        await api.get('/api/auth/me');
+        window.location.replace('/app');
+        return;
+      } catch (err) {
+        document.body.style.visibility = 'visible';
+      }
+    })();
+  </script>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
       <clipPath id="dl-heart-clip" clipPathUnits="objectBoundingBox">
@@ -37,8 +49,10 @@
   <main class="landing-main">
     <div class="landing-copy">
       <div class="landing-hero-photos">
-        <img src="/img/hero-woman.jpg" alt="" class="hero-photo hero-photo-woman" />
-        <img src="/img/hero-man.jpg" alt="" class="hero-photo hero-photo-man" />
+        <div class="hero-photos-glow"></div>
+        <img src="/img/a2.jpeg" alt="Couple heureux au coucher du soleil" class="hero-photo hero-photo-woman" />
+        <img src="/img/a9.jpeg" alt="Couple romantique sur un toit à Paris" class="hero-photo hero-photo-man" />
+        <span class="hero-photos-heart"><i class="fa-solid fa-heart"></i></span>
       </div>
       <h1>Derrière tout grand homme se cache une grande sœur</h1>
       <p class="landing-slogan">Parce que les grandes sœurs ne dérangent pas</p>
@@ -198,6 +212,58 @@
         <h2 class="landing-section-title" style="text-align:left">L'amour ne connaît pas de frontières</h2>
         <p>Que vous viviez dans votre pays d'origine ou en diaspora, Dream Love vous aide à retrouver des célibataires qui partagent votre culture et votre langue, où qu'ils se trouvent dans le monde.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- CARROUSEL DYNAMIQUE -->
+  <section class="landing-marquee">
+    <div class="landing-marquee-track">
+      <img src="/img/a0.jpeg" alt="" />
+      <img src="/img/a1.jpeg" alt="" />
+      <img src="/img/a2.jpeg" alt="" />
+      <img src="/img/a3.jpeg" alt="" />
+      <img src="/img/a4.jpeg" alt="" />
+      <img src="/img/a5.jpeg" alt="" />
+      <img src="/img/a6.jpeg" alt="" />
+      <img src="/img/a7.jpeg" alt="" />
+      <img src="/img/a8.jpeg" alt="" />
+      <img src="/img/a9.jpeg" alt="" />
+      <img src="/img/a10.jpeg" alt="" />
+      <img src="/img/a11.jpeg" alt="" />
+      <img src="/img/a12.jpeg" alt="" />
+      <img src="/img/a13.jpeg" alt="" />
+      <img src="/img/a14.jpeg" alt="" />
+      <img src="/img/a15.jpeg" alt="" />
+      <img src="/img/a16.jpeg" alt="" />
+      <img src="/img/a17.jpeg" alt="" />
+      <img src="/img/a18.jpeg" alt="" />
+      <img src="/img/a19.jpeg" alt="" />
+      <!-- doublon pour une boucle infinie sans coupure -->
+      <img src="/img/a0.jpeg" alt="" />
+      <img src="/img/a1.jpeg" alt="" />
+      <img src="/img/a2.jpeg" alt="" />
+      <img src="/img/a3.jpeg" alt="" />
+      <img src="/img/a4.jpeg" alt="" />
+      <img src="/img/a5.jpeg" alt="" />
+      <img src="/img/a6.jpeg" alt="" />
+      <img src="/img/a7.jpeg" alt="" />
+      <img src="/img/a8.jpeg" alt="" />
+      <img src="/img/a9.jpeg" alt="" />
+      <img src="/img/a10.jpeg" alt="" />
+      <img src="/img/a11.jpeg" alt="" />
+      <img src="/img/a12.jpeg" alt="" />
+      <img src="/img/a13.jpeg" alt="" />
+      <img src="/img/a14.jpeg" alt="" />
+      <img src="/img/a15.jpeg" alt="" />
+      <img src="/img/a16.jpeg" alt="" />
+      <img src="/img/a17.jpeg" alt="" />
+      <img src="/img/a18.jpeg" alt="" />
+      <img src="/img/a19.jpeg" alt="" />
+    </div>
+    <div class="landing-marquee-overlay"></div>
+    <div class="landing-marquee-caption">
+      <h3>Des histoires d'amour, partout dans le monde</h3>
+      <p>Chaque jour, des célibataires se rencontrent et se retrouvent grâce à Dream Love</p>
     </div>
   </section>
 
