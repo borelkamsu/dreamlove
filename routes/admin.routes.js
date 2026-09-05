@@ -29,16 +29,25 @@ router.get('/session', (req, res) => {
 });
 
 router.get('/stats', requireAdmin, async (req, res) => {
-  const [totalUsers, verifiedUsers, pendingVerifications, totalMatches, totalMessages, onlineNow] =
+  const [totalUsers, verifiedUsers, pendingVerifications, rejectedVerifications, totalMatches, totalMessages, onlineNow] =
     await Promise.all([
       User.countDocuments({}),
       User.countDocuments({ verified: true }),
       User.countDocuments({ verificationStatus: 'pending' }),
+      User.countDocuments({ verificationStatus: 'rejected' }),
       Conversation.countDocuments({}),
       Message.countDocuments({}),
       User.countDocuments({ online: true }),
     ]);
-  res.json({ totalUsers, verifiedUsers, pendingVerifications, totalMatches, totalMessages, onlineNow });
+  res.json({
+    totalUsers,
+    verifiedUsers,
+    pendingVerifications,
+    rejectedVerifications,
+    totalMatches,
+    totalMessages,
+    onlineNow,
+  });
 });
 
 router.get('/users', requireAdmin, async (req, res) => {

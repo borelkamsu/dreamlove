@@ -154,6 +154,15 @@ router.post(
       user.verificationRejectReason = '';
       await user.save();
 
+      const io = req.app.get('io');
+      if (io) {
+        io.to('admins').emit('admin:new-verification', {
+          userId: user._id,
+          name: user.name,
+          email: user.email,
+        });
+      }
+
       res.json({ verificationStatus: user.verificationStatus });
     } catch (err) {
       console.error(err);

@@ -36,11 +36,19 @@
     <div class="mobile-topbar">
       <button type="button" class="hamburger-btn" id="admin-menu-toggle" aria-label="Ouvrir le menu"><i class="fa-solid fa-bars"></i></button>
       <span class="mobile-topbar-brand"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</span>
+      <button type="button" class="admin-bell-btn" id="admin-bell-btn-mobile" title="Nouvelles certifications">
+        <i class="fa-solid fa-bell"></i><span class="badge" id="admin-bell-badge-mobile" style="display:none">0</span>
+      </button>
     </div>
     <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
     <aside class="sidebar" id="admin-sidebar">
       <button type="button" class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Fermer le menu"><i class="fa-solid fa-xmark"></i></button>
-      <button type="button" class="brand-logo brand-logo-btn" id="admin-home-btn"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</button>
+      <div class="sidebar-brand-row">
+        <button type="button" class="brand-logo brand-logo-btn" id="admin-home-btn"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</button>
+        <button type="button" class="admin-bell-btn" id="admin-bell-btn-desktop" title="Nouvelles certifications">
+          <i class="fa-solid fa-bell"></i><span class="badge" id="admin-bell-badge-desktop" style="display:none">0</span>
+        </button>
+      </div>
       <nav>
         <button class="nav-btn active" data-tab="overview"><i class="fa-solid fa-gauge-high"></i> Tableau de bord</button>
         <button class="nav-btn" data-tab="users"><i class="fa-solid fa-users"></i> Utilisateurs</button>
@@ -97,6 +105,7 @@
 
       <section class="tab-panel" id="tab-verifications" style="display:none">
         <h1>Demandes de certification</h1>
+        <div class="stat-cards" id="verif-stat-cards"></div>
         <div id="verifications-list"></div>
       </section>
 
@@ -117,6 +126,7 @@
     <img id="lightbox-img" src="" alt="" />
   </div>
 
+  <script src="/socket.io/socket.io.js"></script>
   <script src="/js/admin/admin.js"></script>
 </body>
 </html>

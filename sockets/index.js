@@ -8,14 +8,23 @@ function initSockets(io, sessionMiddleware) {
 
   io.use((socket, next) => {
     const session = socket.request.session;
-    if (!session || !session.userId) {
-      return next(new Error('unauthorized'));
+    if (session && session.userId) {
+      socket.userId = session.userId;
+      return next();
     }
-    socket.userId = session.userId;
-    next();
+    if (session && session.isAdmin) {
+      socket.isAdmin = true;
+      return next();
+    }
+    return next(new Error('unauthorized'));
   });
 
   io.on('connection', async (socket) => {
+    if (socket.isAdmin) {
+      socket.join('admins');
+      return;
+    }
+
     const userId = socket.userId;
     socket.join(`user:${userId}`);
 

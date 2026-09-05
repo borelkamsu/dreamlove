@@ -45,6 +45,33 @@ document.getElementById('lightbox').addEventListener('click', () => {
   document.getElementById('lightbox').classList.remove('show');
 });
 
+function showAdminToast(message) {
+  let toast = document.getElementById('admin-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'admin-toast';
+    toast.className = 'admin-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<i class="fa-solid fa-bell"></i><span>${escapeHtml(message)}</span>`;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 4500);
+}
+
+function updateBellBadge(count) {
+  ['admin-bell-badge-mobile', 'admin-bell-badge-desktop'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (count > 0) {
+      el.textContent = count > 9 ? '9+' : count;
+      el.style.display = 'flex';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
 async function loadStats() {
   const stats = await adminApi.get('/api/admin/stats');
   const cards = [
@@ -58,6 +85,20 @@ async function loadStats() {
   document.getElementById('stat-cards').innerHTML = cards
     .map((c) => `<div class="stat-card"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>`)
     .join('');
+
+  updateBellBadge(stats.pendingVerifications);
+
+  const verifHost = document.getElementById('verif-stat-cards');
+  if (verifHost) {
+    const verifCards = [
+      { label: 'En attente', num: stats.pendingVerifications },
+      { label: 'Certifiés', num: stats.verifiedUsers },
+      { label: 'Refusés', num: stats.rejectedVerifications },
+    ];
+    verifHost.innerHTML = verifCards
+      .map((c) => `<div class="stat-card"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>`)
+      .join('');
+  }
 }
 
 async function loadUsers() {
@@ -279,7 +320,7 @@ function switchTab(tab) {
   document.getElementById(`tab-${tab}`).style.display = 'block';
   document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
   if (tab === 'users') loadUsers();
-  if (tab === 'verifications') loadVerifications();
+  if (tab === 'verifications') { loadVerifications(); loadStats(); }
   if (tab === 'matches') loadMatches();
   if (tab === 'overview') { loadStats(); loadOverviewPending(); }
   closeSidebar();
@@ -303,6 +344,11 @@ function initDashboard() {
   }
   if (backdrop) backdrop.addEventListener('click', closeSidebar);
   if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', closeSidebar);
+  ['admin-bell-btn-mobile', 'admin-bell-btn-desktop'].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', () => switchTab('verifications'));
+  });
+  initAdminSocket();
   document.getElementById('admin-logout').addEventListener('click', async () => {
     await adminApi.post('/api/admin/logout');
     document.getElementById('dashboard-view').style.display = 'none';
@@ -321,6 +367,21 @@ function initDashboard() {
 
   loadStats();
   loadOverviewPending();
+}
+
+let adminSocket = null;
+
+function initAdminSocket() {
+  if (adminSocket) return;
+  adminSocket = io({ withCredentials: true });
+  adminSocket.on('admin:new-verification', (data) => {
+    showAdminToast(`Nouvelle demande de certification : ${data.name}`);
+    loadStats();
+    const verifTabVisible = document.getElementById('tab-verifications').style.display !== 'none';
+    const overviewTabVisible = document.getElementById('tab-overview').style.display !== 'none';
+    if (verifTabVisible) loadVerifications();
+    if (overviewTabVisible) loadOverviewPending();
+  });
 }
 
 function debounce(fn, ms) {
