@@ -62,6 +62,8 @@ const DiscoverModule = (() => {
           ${profile.distanceKm != null ? `<p><i class="fa-solid fa-location-arrow"></i> À ${profile.distanceKm} km</p>` : ''}
           ${profile.originCountry ? `<p>${countryFlagEmoji(profile.originCountry)} Origine : ${escapeHtml(profile.originCountry)}</p>` : ''}
           ${relationshipLabel ? `<p><i class="fa-solid fa-heart-circle-check"></i> ${escapeHtml(relationshipLabel)}</p>` : ''}
+          ${profile.height ? `<p><i class="fa-solid fa-ruler-vertical"></i> ${heightLabel(profile.height)}</p>` : ''}
+          ${profile.languages && profile.languages.length ? `<p><i class="fa-solid fa-language"></i> ${escapeHtml(profile.languages.join(', '))}</p>` : ''}
           ${profile.bio ? `<p>${escapeHtml(profile.bio)}</p>` : ''}
           ${interestsHtml ? `<div class="interest-chips">${interestsHtml}</div>` : ''}
         </div>

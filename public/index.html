@@ -5,25 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Dream Love — Rencontrez, matchez, aimez</title>
 <meta name="description" content="Dream Love, l'application de rencontre qui certifie ses profils pour des rencontres en toute confiance." />
-<meta name="theme-color" content="#ff4458" />
+<meta name="theme-color" content="#85386e" />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 <link rel="icon" href="/icons/icon-192.png" />
 <link rel="stylesheet" href="/css/styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
-<body style="visibility:hidden">
+<body>
   <script src="/js/api.js"></script>
   <script>
-    (async () => {
-      try {
-        await api.get('/api/auth/me');
-        window.location.replace('/app');
-        return;
-      } catch (err) {
-        document.body.style.visibility = 'visible';
-      }
-    })();
+    // Logged-in members can come back to this page from the app: swap the guest links for "Mon espace"
+    window.DL_SESSION = api.get('/api/auth/me').then(() => true).catch(() => false);
+    window.DL_SESSION.then((loggedIn) => {
+      if (!loggedIn) return;
+      const apply = () => {
+        document.querySelectorAll('[data-guest-only]').forEach((el) => el.remove());
+        document.querySelectorAll('[data-member-link]').forEach((el) => {
+          el.href = '/app';
+          el.innerHTML = el.dataset.memberLink;
+        });
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+      else apply();
+    });
   </script>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
@@ -42,7 +47,7 @@
         <a href="#temoignages">Témoignages</a>
         <a href="#faq">FAQ</a>
       </nav>
-      <a href="/login.html" class="landing-login-link">Se connecter</a>
+      <a href="/login.html" class="landing-login-link" data-member-link="&lt;i class=&quot;fa-solid fa-user&quot;&gt;&lt;/i&gt; Mon espace">Se connecter</a>
     </div>
   </header>
 
@@ -98,7 +103,7 @@
       <span><i class="fa-solid fa-lock"></i> Vos données protégées</span>
     </div>
 
-    <p class="landing-alt-link">
+    <p class="landing-alt-link" data-guest-only>
       Vous avez déjà un compte ? <a href="/login.html">Se connecter</a> ·
       <a href="/register.html">Créer un compte directement</a>
     </p>
@@ -271,7 +276,7 @@
   <section class="landing-cta">
     <h2>Prêt à rencontrer votre âme sœur ?</h2>
     <p>Rejoignez la communauté Dream Love, c'est gratuit et ça ne prend qu'une minute.</p>
-    <a href="/register.html" class="btn btn-primary">Créer mon compte</a>
+    <a href="/register.html" class="btn btn-primary" data-member-link="Accéder à mon espace">Créer mon compte</a>
   </section>
 
   <!-- FAQ -->
@@ -309,8 +314,8 @@
     <a href="/" class="brand-logo"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
     <nav class="landing-footer-links">
       <a href="/">Accueil</a>
-      <a href="/login.html">Se connecter</a>
-      <a href="/register.html">Créer un compte</a>
+      <a href="/login.html" data-member-link="Mon espace">Se connecter</a>
+      <a href="/register.html" data-guest-only>Créer un compte</a>
       <a href="#comment-ca-marche">Comment ça marche</a>
       <a href="#securite">Sécurité</a>
       <a href="#faq">FAQ</a>
@@ -337,7 +342,7 @@
       renderCityField(cityHost, countrySelect.value, '');
     });
 
-    document.getElementById('landing-search-form').addEventListener('submit', (e) => {
+    document.getElementById('landing-search-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const criteria = {
         seeking: document.getElementById('ls-seeking').value,
@@ -351,7 +356,7 @@
       } catch (err) {
         /* localStorage unavailable, continue without prefill */
       }
-      window.location.href = '/register.html';
+      window.location.href = (await window.DL_SESSION) ? '/app' : '/register.html';
     });
 
     const HERO_TESTIMONIALS = [

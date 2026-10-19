@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { RELATIONSHIP_STATUSES } = require('../utils/profileOptions');
 
 const photoSchema = new mongoose.Schema(
   {
@@ -28,6 +29,7 @@ const geoSchema = new mongoose.Schema(
 const userSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    emailVerified: { type: Boolean, default: false },
     password: { type: String, required: true },
     name: { type: String, required: true, trim: true },
     birthdate: { type: Date, required: true },
@@ -37,11 +39,10 @@ const userSchema = new mongoose.Schema(
     location: { type: String, default: '', trim: true },
     country: { type: String, default: '', trim: true },
     originCountry: { type: String, default: '', trim: true },
-    relationshipStatus: {
-      type: String,
-      enum: ['celibataire', 'en_couple', 'fiance', 'marie', 'divorce', 'veuf', 'complique'],
-      default: 'celibataire',
-    },
+    // Allowed values are enforced in the routes; older accounts may still hold retired values
+    relationshipStatus: { type: String, default: 'celibataire' },
+    height: { type: Number, default: null },
+    languages: { type: [String], default: [] },
     preferredAgeMin: { type: Number, default: 18 },
     preferredAgeMax: { type: Number, default: 99 },
     maxDistance: { type: Number, default: null },
@@ -86,7 +87,9 @@ userSchema.methods.toPublicJSON = function (viewerId) {
     location: this.location,
     country: this.country,
     originCountry: this.originCountry,
-    relationshipStatus: this.relationshipStatus,
+    relationshipStatus: RELATIONSHIP_STATUSES.includes(this.relationshipStatus) ? this.relationshipStatus : '',
+    height: this.height || null,
+    languages: this.languages || [],
     preferredAgeMin: this.preferredAgeMin,
     preferredAgeMax: this.preferredAgeMax,
     maxDistance: this.maxDistance,

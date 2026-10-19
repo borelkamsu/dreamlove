@@ -112,6 +112,8 @@ const ProfileModule = (() => {
     select.dataset.populated = '1';
   }
 
+  let getEditLanguages = null;
+
   function fillEditForm() {
     const user = State.user;
     populateCountrySelect('edit-country');
@@ -122,6 +124,8 @@ const ProfileModule = (() => {
     document.getElementById('edit-origin-country').value = user.originCountry || '';
     document.getElementById('edit-seeking').value = user.seeking || 'tous';
     document.getElementById('edit-relationship-status').value = user.relationshipStatus || 'celibataire';
+    document.getElementById('edit-height').value = user.height || '';
+    getEditLanguages = renderLanguageChips(document.getElementById('edit-languages'), user.languages || []);
     document.getElementById('edit-age-min').value = user.preferredAgeMin || 18;
     document.getElementById('edit-age-max').value = user.preferredAgeMax || 99;
     document.getElementById('edit-max-distance').value = user.maxDistance || '';
@@ -160,6 +164,8 @@ const ProfileModule = (() => {
       originCountry: document.getElementById('edit-origin-country').value,
       seeking: document.getElementById('edit-seeking').value,
       relationshipStatus: document.getElementById('edit-relationship-status').value,
+      height: document.getElementById('edit-height').value,
+      languages: getEditLanguages ? getEditLanguages() : undefined,
       preferredAgeMin: document.getElementById('edit-age-min').value,
       preferredAgeMax: document.getElementById('edit-age-max').value,
       maxDistance: document.getElementById('edit-max-distance').value,

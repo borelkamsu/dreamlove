@@ -4,13 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Inscription — Dream Love</title>
-<meta name="theme-color" content="#ff4458" />
+<meta name="theme-color" content="#85386e" />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="icon" href="/icons/icon-192.png" />
 <link rel="stylesheet" href="/css/styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
-<body style="visibility:hidden">
+<body class="auth-page" style="visibility:hidden">
   <script src="/js/api.js"></script>
   <script>
     (async () => {
@@ -25,7 +25,7 @@
   </script>
   <div class="container">
     <div class="auth-wrap">
-      <a href="/" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <a href="/" class="brand-logo"><img src="/img/logo-white.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
       <p class="auth-sub" id="step-sub">Créez votre profil en 1 minute</p>
 
       <!-- ETAPE 1 : INFOS -->
@@ -90,13 +90,18 @@
             <label>Situation sentimentale</label>
             <select name="relationshipStatus">
               <option value="celibataire">Célibataire</option>
-              <option value="en_couple">En couple</option>
-              <option value="fiance">Fiancé(e)</option>
-              <option value="marie">Marié(e)</option>
               <option value="divorce">Divorcé(e)</option>
               <option value="veuf">Veuf / Veuve</option>
               <option value="complique">C'est compliqué</option>
             </select>
+          </div>
+          <div class="field">
+            <label>Taille (en cm)</label>
+            <input type="number" name="height" min="120" max="230" placeholder="ex : 175" required />
+          </div>
+          <div class="field">
+            <label>Langues parlées</label>
+            <div class="chip-select" id="languages-select"></div>
           </div>
           <div class="field">
             <label>Tranche d'âge préférée pour vos rencontres</label>
@@ -108,6 +113,25 @@
           </div>
           <button type="submit" class="btn btn-primary" id="submit-btn">Continuer</button>
         </form>
+      </div>
+
+      <!-- ETAPE 1 BIS : CODE DE VERIFICATION EMAIL -->
+      <div class="auth-card" id="code-card" style="display:none">
+        <div class="error-msg" id="code-error-msg"></div>
+        <p style="margin-top:0;color:var(--text-muted);font-size:13px;">
+          Nous avons envoyé un code à 6 chiffres à <strong id="code-email"></strong>.
+          Saisissez-le pour confirmer votre adresse email (pensez à vérifier vos spams).
+        </p>
+        <form id="code-form">
+          <div class="field">
+            <input type="text" class="code-input" id="code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required />
+          </div>
+          <button type="submit" class="btn btn-primary" id="code-submit-btn">Vérifier et créer mon compte</button>
+        </form>
+        <div class="code-actions">
+          <button type="button" class="btn-text" id="code-back-btn"><i class="fa-solid fa-arrow-left"></i> Modifier mes infos</button>
+          <button type="button" class="btn-text" id="code-resend-btn" disabled>Renvoyer le code</button>
+        </div>
       </div>
 
       <!-- ETAPE 2 : PHOTO OBLIGATOIRE -->
@@ -146,6 +170,7 @@
   <script src="/js/countries.js"></script>
   <script src="/js/cities.js"></script>
   <script src="/js/camera.js"></script>
+  <script src="/js/languages.js"></script>
   <script>
     const countrySelect = document.getElementById('country-select');
     const originSelect = document.getElementById('origin-country-select');
@@ -186,36 +211,121 @@
     const submitBtn = document.getElementById('submit-btn');
     const pendingPhotos = {};
 
+    const getLanguages = renderLanguageChips(document.getElementById('languages-select'), ['Français']);
+
+    const codeCard = document.getElementById('code-card');
+    const codeError = document.getElementById('code-error-msg');
+    const codeInput = document.getElementById('code-input');
+    const codeSubmitBtn = document.getElementById('code-submit-btn');
+    const resendBtn = document.getElementById('code-resend-btn');
+    let registrationData = null;
+    let resendTimer = null;
+
+    function collectRegistrationData() {
+      const fd = new FormData(form);
+      return {
+        name: fd.get('name'),
+        email: fd.get('email'),
+        password: fd.get('password'),
+        birthdate: fd.get('birthdate'),
+        gender: fd.get('gender'),
+        seeking: fd.get('seeking'),
+        country: fd.get('country'),
+        location: getCityFieldValue(cityHost),
+        originCountry: fd.get('originCountry'),
+        relationshipStatus: fd.get('relationshipStatus'),
+        height: fd.get('height'),
+        languages: getLanguages(),
+        preferredAgeMin: fd.get('preferredAgeMin'),
+        preferredAgeMax: fd.get('preferredAgeMax'),
+      };
+    }
+
+    function startResendCountdown(seconds) {
+      clearInterval(resendTimer);
+      let remaining = seconds;
+      resendBtn.disabled = true;
+      resendBtn.textContent = `Renvoyer le code (${remaining} s)`;
+      resendTimer = setInterval(() => {
+        remaining -= 1;
+        if (remaining <= 0) {
+          clearInterval(resendTimer);
+          resendBtn.disabled = false;
+          resendBtn.textContent = 'Renvoyer le code';
+        } else {
+          resendBtn.textContent = `Renvoyer le code (${remaining} s)`;
+        }
+      }, 1000);
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMsg.classList.remove('show');
+      const data = collectRegistrationData();
+      if (data.languages.length === 0) {
+        errorMsg.textContent = 'Sélectionnez au moins une langue parlée';
+        errorMsg.classList.add('show');
+        return;
+      }
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Création...';
-      const fd = new FormData(form);
+      submitBtn.textContent = 'Envoi du code...';
       try {
-        await api.post('/api/auth/register', {
-          name: fd.get('name'),
-          email: fd.get('email'),
-          password: fd.get('password'),
-          birthdate: fd.get('birthdate'),
-          gender: fd.get('gender'),
-          seeking: fd.get('seeking'),
-          country: fd.get('country'),
-          location: getCityFieldValue(cityHost),
-          originCountry: fd.get('originCountry'),
-          relationshipStatus: fd.get('relationshipStatus'),
-          preferredAgeMin: fd.get('preferredAgeMin'),
-          preferredAgeMax: fd.get('preferredAgeMax'),
-        });
+        await api.post('/api/auth/register/send-code', data);
+        registrationData = data;
+        document.getElementById('code-email').textContent = data.email;
         document.getElementById('step1-card').style.display = 'none';
-        document.getElementById('step2-card').style.display = 'block';
-        document.getElementById('step-sub').textContent = 'Dernière étape : votre photo';
+        codeCard.style.display = 'block';
+        document.getElementById('step-sub').textContent = 'Vérifiez votre adresse email';
+        codeInput.value = '';
+        codeInput.focus();
+        startResendCountdown(60);
       } catch (err) {
         errorMsg.textContent = err.message;
         errorMsg.classList.add('show');
+      } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Continuer';
       }
+    });
+
+    document.getElementById('code-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      codeError.classList.remove('show');
+      codeSubmitBtn.disabled = true;
+      codeSubmitBtn.textContent = 'Vérification...';
+      try {
+        await api.post('/api/auth/register', { ...registrationData, code: codeInput.value.trim() });
+        clearInterval(resendTimer);
+        codeCard.style.display = 'none';
+        document.getElementById('step2-card').style.display = 'block';
+        document.getElementById('step-sub').textContent = 'Dernière étape : votre photo';
+      } catch (err) {
+        codeError.textContent = err.message;
+        codeError.classList.add('show');
+        codeSubmitBtn.disabled = false;
+        codeSubmitBtn.textContent = 'Vérifier et créer mon compte';
+      }
+    });
+
+    resendBtn.addEventListener('click', async () => {
+      codeError.classList.remove('show');
+      resendBtn.disabled = true;
+      try {
+        await api.post('/api/auth/register/send-code', registrationData);
+        showToast('Un nouveau code vous a été envoyé');
+        startResendCountdown(60);
+      } catch (err) {
+        codeError.textContent = err.message;
+        codeError.classList.add('show');
+        resendBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('code-back-btn').addEventListener('click', () => {
+      clearInterval(resendTimer);
+      codeCard.style.display = 'none';
+      document.getElementById('step1-card').style.display = 'block';
+      document.getElementById('step-sub').textContent = 'Créez votre profil en 1 minute';
     });
 
     function setPreview(slot, url) {

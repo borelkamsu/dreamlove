@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dreamlove-v15';
+const CACHE_NAME = 'dreamlove-v16';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -12,6 +12,7 @@ const PRECACHE_URLS = [
   '/js/countries.js',
   '/js/numberInputFix.js',
   '/js/interests.js',
+  '/js/languages.js',
   '/js/camera.js',
   '/js/auth.js',
   '/js/notifications.js',
@@ -23,7 +24,7 @@ const PRECACHE_URLS = [
   '/js/sw-register.js',
   '/img/default-avatar.svg',
   '/img/logo-white.png',
-  '/img/logo-red.png',
+  '/img/logo-plum.png',
   '/manifest.webmanifest',
 ];
 

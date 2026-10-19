@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Alex+Brush&display=swap');
 
 :root {
-  --brand-1: #ff4458;
-  --brand-2: #1a0509;
-  --brand-mid: #2a0d10;
-  --brand-gradient: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-mid) 65%, var(--brand-2) 100%);
+  --brand-1: #85386e;
+  --brand-2: #6b2b58;
+  --brand-mid: #85386e;
+  --brand-gradient: linear-gradient(135deg, #9a4582 0%, var(--brand-mid) 55%, var(--brand-2) 100%);
   --verified: #3897f0;
   --success: #2ecc71;
   --bg: #f6f7fb;
@@ -12,7 +12,7 @@
   --border: #e7e8f0;
   --text: #23232f;
   --text-muted: #8b8b99;
-  --danger: #ff4458;
+  --danger: #d6334a;
   --radius-lg: 18px;
   --radius-md: 12px;
   --shadow-sm: 0 2px 10px rgba(20,20,40,0.05);
@@ -82,7 +82,7 @@ img { max-width: 100%; }
 .admin-shell { display: flex; min-height: 100vh; }
 .sidebar {
   width: 220px;
-  background: #1c1c28;
+  background: #5a2349;
   color: #fff;
   padding: 22px 16px;
   flex-shrink: 0;
@@ -115,7 +115,7 @@ img { max-width: 100%; }
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   padding: 0 3px;
-  border: 2px solid #1c1c28;
+  border: 2px solid #5a2349;
 }
 .mobile-topbar .admin-bell-btn { margin-left: auto; color: #fff; }
 
@@ -124,7 +124,7 @@ img { max-width: 100%; }
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
-  background: #1c1c28;
+  background: #5a2349;
   color: #fff;
   padding: 12px 20px;
   border-radius: 10px;
@@ -216,7 +216,7 @@ th { color: var(--text-muted); font-weight: 700; font-size: 12px; text-transform
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #1c1c28;
+    background: #5a2349;
     color: #fff;
     padding: 12px 16px;
     position: sticky;
@@ -317,3 +317,31 @@ th { color: var(--text-muted); font-weight: 700; font-size: 12px; text-transform
 .match-card .match-user span { font-weight: 600; font-size: 13.5px; }
 .match-card .match-heart { color: var(--brand-1); font-size: 15px; flex-shrink: 0; }
 .match-card .match-date { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+
+/* ---- Team / roles ---- */
+.field select, .team-row-select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--border);
+  font-size: 14px;
+  background: #fff;
+  font-family: inherit;
+}
+.team-row-select { width: auto; padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+.team-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end; }
+.team-form .field { margin-bottom: 0; }
+.team-form .btn { height: 46px; }
+.role-help { margin: 16px 0 0; padding-left: 18px; color: var(--text-muted); font-size: 12.5px; line-height: 1.6; }
+.badge-pill.role-admin { background: #f4e8f0; color: var(--brand-1); }
+.badge-pill.role-editor { background: #e8f1fb; color: #2f6fb3; }
+.admin-identity {
+  margin-top: 24px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #f0dfea;
+}
+.admin-identity strong { color: #fff; display: block; font-size: 13.5px; }

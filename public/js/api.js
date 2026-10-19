@@ -65,9 +65,6 @@ function goToProfile(userId) {
 
 const RELATIONSHIP_STATUS_LABELS = {
   celibataire: 'Célibataire',
-  en_couple: 'En couple',
-  fiance: 'Fiancé(e)',
-  marie: 'Marié(e)',
   divorce: 'Divorcé(e)',
   veuf: 'Veuf / Veuve',
   complique: "C'est compliqué",
@@ -75,6 +72,12 @@ const RELATIONSHIP_STATUS_LABELS = {
 
 function relationshipStatusLabel(value) {
   return RELATIONSHIP_STATUS_LABELS[value] || '';
+}
+
+function heightLabel(cm) {
+  if (!cm) return '';
+  const m = Math.floor(cm / 100);
+  return `${m},${String(cm % 100).padStart(2, '0')} m`;
 }
 
 const COUNTRY_ISO_CODES = {

@@ -41,7 +41,7 @@ const NotificationsModule = (() => {
 
   async function loadAdminPanel() {
     const host = document.getElementById('notif-panel-admin');
-    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(255,68,88,0.2);margin:30px auto;"></div>';
+    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(133,56,110,0.2);margin:30px auto;"></div>';
     try {
       const { messages } = await api.get('/api/notifications/admin-messages');
       if (messages.length === 0) {
@@ -73,7 +73,7 @@ const NotificationsModule = (() => {
 
   async function loadLikesPanel() {
     const host = document.getElementById('notif-panel-likes');
-    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(255,68,88,0.2);margin:30px auto;"></div>';
+    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(133,56,110,0.2);margin:30px auto;"></div>';
     try {
       const { users } = await api.get('/api/notifications/likes-received');
       if (users.length === 0) {
@@ -128,7 +128,7 @@ const NotificationsModule = (() => {
 
   async function loadMessagesPanel() {
     const host = document.getElementById('notif-panel-messages');
-    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(255,68,88,0.2);margin:30px auto;"></div>';
+    host.innerHTML = '<div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(133,56,110,0.2);margin:30px auto;"></div>';
     try {
       const { matches } = await api.get('/api/matches');
       matchesCache = matches;

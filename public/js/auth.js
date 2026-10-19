@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (window.ProfileModule) window.ProfileModule.refresh();
   });
 
-  document.querySelectorAll('.nav-btn').forEach((btn) => {
+  document.querySelectorAll('.nav-btn[data-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const view = btn.dataset.view;
       switchView(view);
@@ -50,9 +50,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   ['app-home-btn-desktop', 'app-home-btn-mobile'].forEach((id) => {
     const btn = document.getElementById(id);
     if (btn) {
+      // The logo leads back to the public landing page; the session stays open
       btn.addEventListener('click', () => {
-        switchView('discover');
-        if (window.DiscoverModule) window.DiscoverModule.refresh();
+        window.location.href = '/';
       });
     }
   });

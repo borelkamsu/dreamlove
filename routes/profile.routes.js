@@ -4,14 +4,14 @@ const { requireAuth } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { uploadBuffer, cloudinary } = require('../config/cloudinary');
 const { INTERESTS } = require('../utils/interests');
+const { RELATIONSHIP_STATUSES, sanitizeLanguages, parseHeight } = require('../utils/profileOptions');
 
 const router = express.Router();
 
 router.put('/', requireAuth, async (req, res) => {
   try {
-    const { name, bio, location, seeking, country, originCountry, interests, relationshipStatus } = req.body;
+    const { name, bio, location, seeking, country, originCountry, interests, relationshipStatus, languages, height } = req.body;
     let { preferredAgeMin, preferredAgeMax, maxDistance } = req.body;
-    const RELATIONSHIP_STATUSES = ['celibataire', 'en_couple', 'fiance', 'marie', 'divorce', 'veuf', 'complique'];
     const update = {};
     if (name !== undefined) update.name = name;
     if (bio !== undefined) update.bio = bio.slice(0, 500);
@@ -21,6 +21,14 @@ router.put('/', requireAuth, async (req, res) => {
     if (originCountry !== undefined) update.originCountry = originCountry;
     if (relationshipStatus !== undefined && RELATIONSHIP_STATUSES.includes(relationshipStatus)) {
       update.relationshipStatus = relationshipStatus;
+    }
+    if (languages !== undefined) update.languages = sanitizeLanguages(languages);
+    if (height !== undefined) {
+      const parsedHeight = parseHeight(height);
+      if (parsedHeight === undefined) {
+        return res.status(400).json({ error: 'Taille invalide (entre 120 et 230 cm)' });
+      }
+      update.height = parsedHeight;
     }
     if (maxDistance !== undefined) {
       maxDistance = parseInt(maxDistance, 10);

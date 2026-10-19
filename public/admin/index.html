@@ -14,7 +14,7 @@
   <!-- LOGIN -->
   <div class="admin-login-wrap" id="login-view">
     <div class="admin-login-card">
-      <a href="/" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <a href="/" class="brand-logo"><img src="/img/logo-plum.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
       <div class="sub">Espace administrateur</div>
       <div class="error-msg" id="login-error"></div>
       <form id="admin-login-form">
@@ -50,11 +50,13 @@
         </button>
       </div>
       <nav>
-        <button class="nav-btn active" data-tab="overview"><i class="fa-solid fa-gauge-high"></i> Tableau de bord</button>
-        <button class="nav-btn" data-tab="users"><i class="fa-solid fa-users"></i> Utilisateurs</button>
+        <button class="nav-btn active" data-tab="overview" data-admin-only><i class="fa-solid fa-gauge-high"></i> Tableau de bord</button>
+        <button class="nav-btn" data-tab="users" data-admin-only><i class="fa-solid fa-users"></i> Utilisateurs</button>
         <button class="nav-btn" data-tab="verifications"><i class="fa-solid fa-shield-halved"></i> Vérifications</button>
-        <button class="nav-btn" data-tab="matches"><i class="fa-solid fa-heart"></i> Matchs</button>
+        <button class="nav-btn" data-tab="matches" data-admin-only><i class="fa-solid fa-heart"></i> Matchs</button>
+        <button class="nav-btn" data-tab="team" data-admin-only><i class="fa-solid fa-user-shield"></i> Équipe</button>
       </nav>
+      <div class="admin-identity" id="admin-identity"></div>
       <button class="logout-btn nav-btn" id="admin-logout"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
     </aside>
 
@@ -117,6 +119,52 @@
           </div>
           <div id="matches-list"></div>
           <div class="pagination" id="matches-pagination"></div>
+        </div>
+      </section>
+      <section class="tab-panel" id="tab-team" style="display:none">
+        <h1>Équipe d'administration</h1>
+        <div class="panel">
+          <div class="panel-header"><h2>Créer un compte</h2></div>
+          <div class="error-msg" id="team-error"></div>
+          <form id="team-create-form" class="team-form">
+            <div class="field">
+              <label>Identifiant</label>
+              <input type="text" name="username" required minlength="3" maxlength="30" autocomplete="off" placeholder="ex : marie.dupont" />
+            </div>
+            <div class="field">
+              <label>Mot de passe (8 caractères min.)</label>
+              <input type="password" name="password" required minlength="8" autocomplete="new-password" />
+            </div>
+            <div class="field">
+              <label>Rôle</label>
+              <select name="role" required>
+                <option value="editor">Éditeur — peut uniquement certifier les comptes</option>
+                <option value="admin">Administrateur — accès complet</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-sm" type="submit" id="team-create-btn"><i class="fa-solid fa-user-plus"></i> Créer le compte</button>
+          </form>
+          <ul class="role-help">
+            <li><strong>Éditeur</strong> : voit uniquement les demandes de certification, peut certifier, refuser ou retirer une certification. Ne peut pas créer d'autres comptes.</li>
+            <li><strong>Administrateur</strong> : peut tout faire, y compris gérer les utilisateurs et créer d'autres comptes admin ou éditeur.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Comptes existants</h2></div>
+          <div style="overflow-x:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Identifiant</th>
+                  <th>Rôle</th>
+                  <th>Créé par</th>
+                  <th>Dernière connexion</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="team-tbody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
     </main>

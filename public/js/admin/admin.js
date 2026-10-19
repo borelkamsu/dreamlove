@@ -19,7 +19,28 @@ const adminApi = {
   },
   get(url) { return this.request('GET', url); },
   post(url, body) { return this.request('POST', url, body); },
+  put(url, body) { return this.request('PUT', url, body); },
+  del(url) { return this.request('DELETE', url); },
 };
+
+// Logged-in staff member: { username, role } where role is 'admin' or 'editor'
+let adminSession = { username: '', role: 'editor' };
+
+function isFullAdmin() {
+  return adminSession.role === 'admin';
+}
+
+function roleLabel(role) {
+  return role === 'admin' ? 'Administrateur' : 'Éditeur';
+}
+
+function applyRole() {
+  document.querySelectorAll('[data-admin-only]').forEach((el) => {
+    el.style.display = isFullAdmin() ? '' : 'none';
+  });
+  document.getElementById('admin-identity').innerHTML =
+    `<strong>${escapeHtml(adminSession.username)}</strong>${roleLabel(adminSession.role)}`;
+}
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -215,15 +236,18 @@ function renderVerifCard(req) {
     <div class="verif-actions">
       <button class="btn btn-sm btn-success" data-approve="${req.id}"><i class="fa-solid fa-check"></i> Approuver</button>
       <button class="btn btn-sm btn-danger" data-reject="${req.id}"><i class="fa-solid fa-xmark"></i> Rejeter</button>
-      <button class="btn btn-sm btn-outline" data-message="${req.id}"><i class="fa-solid fa-message"></i> Demander des pièces / Message</button>
+      ${isFullAdmin() ? `<button class="btn btn-sm btn-outline" data-message="${req.id}"><i class="fa-solid fa-message"></i> Demander des pièces / Message</button>` : ''}
     </div>
   `;
   div.querySelectorAll('img[data-full]').forEach((img) => {
     img.addEventListener('click', () => openLightbox(img.dataset.full));
   });
-  div.querySelector('[data-message]').addEventListener('click', () => {
-    sendAdminMessage(req.id, 'Merci de renvoyer une photo plus nette de votre pièce d\'identité et de votre selfie.');
-  });
+  const messageBtn = div.querySelector('[data-message]');
+  if (messageBtn) {
+    messageBtn.addEventListener('click', () => {
+      sendAdminMessage(req.id, 'Merci de renvoyer une photo plus nette de votre pièce d\'identité et de votre selfie.');
+    });
+  }
   div.querySelector('[data-approve]').addEventListener('click', async () => {
     await adminApi.post(`/api/admin/users/${req.id}/verify`);
     loadVerifications();
@@ -307,6 +331,105 @@ async function loadMatches() {
   }
 }
 
+async function loadTeam() {
+  const { admins, me, mainAccount } = await adminApi.get('/api/admin/team');
+  const tbody = document.getElementById('team-tbody');
+  const rows = [];
+  if (mainAccount) {
+    rows.push(`
+      <tr>
+        <td><strong>${escapeHtml(mainAccount)}</strong> <span style="color:var(--text-muted);font-size:12px">(compte principal)</span></td>
+        <td><span class="badge-pill role-admin">Administrateur</span></td>
+        <td>—</td>
+        <td>—</td>
+        <td><span style="color:var(--text-muted);font-size:12px">Défini dans la configuration du serveur</span></td>
+      </tr>`);
+  }
+  admins.forEach((a) => {
+    const isMe = String(a.id) === String(me.id);
+    rows.push(`
+      <tr>
+        <td><strong>${escapeHtml(a.username)}</strong>${isMe ? ' <span style="color:var(--text-muted);font-size:12px">(vous)</span>' : ''}</td>
+        <td>
+          <select class="team-row-select" data-role-select="${a.id}" ${isMe ? 'disabled' : ''}>
+            <option value="editor" ${a.role === 'editor' ? 'selected' : ''}>Éditeur</option>
+            <option value="admin" ${a.role === 'admin' ? 'selected' : ''}>Administrateur</option>
+          </select>
+        </td>
+        <td>${escapeHtml(a.createdBy || '—')}</td>
+        <td>${a.lastLoginAt ? fmtDate(a.lastLoginAt) : 'Jamais'}</td>
+        <td class="actions-cell">
+          <button class="btn btn-sm btn-outline" data-reset-password="${a.id}"><i class="fa-solid fa-key"></i> Mot de passe</button>
+          ${isMe ? '' : `<button class="btn btn-sm btn-danger" data-delete-admin="${a.id}"><i class="fa-solid fa-trash"></i> Supprimer</button>`}
+        </td>
+      </tr>`);
+  });
+  tbody.innerHTML = rows.length
+    ? rows.join('')
+    : '<tr><td colspan="5"><div class="empty-note">Aucun compte</div></td></tr>';
+
+  tbody.querySelectorAll('[data-role-select]').forEach((select) =>
+    select.addEventListener('change', async () => {
+      try {
+        await adminApi.put(`/api/admin/team/${select.dataset.roleSelect}`, { role: select.value });
+        showAdminToast(`Rôle mis à jour : ${roleLabel(select.value)}`);
+      } catch (err) {
+        alert(err.message);
+      }
+      loadTeam();
+    })
+  );
+  tbody.querySelectorAll('[data-reset-password]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      const password = prompt('Nouveau mot de passe (8 caractères minimum) :');
+      if (!password) return;
+      try {
+        await adminApi.put(`/api/admin/team/${btn.dataset.resetPassword}`, { password });
+        showAdminToast('Mot de passe modifié');
+      } catch (err) {
+        alert(err.message);
+      }
+    })
+  );
+  tbody.querySelectorAll('[data-delete-admin]').forEach((btn) =>
+    btn.addEventListener('click', async () => {
+      if (!confirm('Supprimer définitivement ce compte ? La personne sera déconnectée immédiatement.')) return;
+      try {
+        await adminApi.del(`/api/admin/team/${btn.dataset.deleteAdmin}`);
+        showAdminToast('Compte supprimé');
+      } catch (err) {
+        alert(err.message);
+      }
+      loadTeam();
+    })
+  );
+}
+
+async function createTeamMember(e) {
+  e.preventDefault();
+  const form = e.target;
+  const errorBox = document.getElementById('team-error');
+  const submitBtn = document.getElementById('team-create-btn');
+  errorBox.classList.remove('show');
+  submitBtn.disabled = true;
+  const fd = new FormData(form);
+  try {
+    const { admin } = await adminApi.post('/api/admin/team', {
+      username: fd.get('username'),
+      password: fd.get('password'),
+      role: fd.get('role'),
+    });
+    form.reset();
+    showAdminToast(`Compte « ${admin.username} » créé (${roleLabel(admin.role)})`);
+    loadTeam();
+  } catch (err) {
+    errorBox.textContent = err.message;
+    errorBox.classList.add('show');
+  } finally {
+    submitBtn.disabled = false;
+  }
+}
+
 function closeSidebar() {
   const sidebar = document.getElementById('admin-sidebar');
   const backdrop = document.getElementById('sidebar-backdrop');
@@ -323,6 +446,7 @@ function switchTab(tab) {
   if (tab === 'verifications') { loadVerifications(); loadStats(); }
   if (tab === 'matches') loadMatches();
   if (tab === 'overview') { loadStats(); loadOverviewPending(); }
+  if (tab === 'team') loadTeam();
   closeSidebar();
 }
 
@@ -331,7 +455,9 @@ function initDashboard() {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
   const homeBtn = document.getElementById('admin-home-btn');
-  if (homeBtn) homeBtn.addEventListener('click', () => switchTab('overview'));
+  if (homeBtn) homeBtn.addEventListener('click', () => switchTab(isFullAdmin() ? 'overview' : 'verifications'));
+  document.getElementById('team-create-form').addEventListener('submit', createTeamMember);
+  applyRole();
   const menuToggle = document.getElementById('admin-menu-toggle');
   const sidebar = document.getElementById('admin-sidebar');
   const backdrop = document.getElementById('sidebar-backdrop');
@@ -351,8 +477,7 @@ function initDashboard() {
   initAdminSocket();
   document.getElementById('admin-logout').addEventListener('click', async () => {
     await adminApi.post('/api/admin/logout');
-    document.getElementById('dashboard-view').style.display = 'none';
-    document.getElementById('login-view').style.display = 'flex';
+    window.location.reload();
   });
   document.getElementById('user-search').addEventListener('input', debounce(() => {
     usersState.search = document.getElementById('user-search').value;
@@ -365,8 +490,8 @@ function initDashboard() {
     loadUsers();
   });
 
-  loadStats();
-  loadOverviewPending();
+  // Editors only work on certification requests
+  switchTab(isFullAdmin() ? 'overview' : 'verifications');
 }
 
 let adminSocket = null;
@@ -400,10 +525,11 @@ document.getElementById('admin-login-form').addEventListener('submit', async (e)
   submitBtn.disabled = true;
   const fd = new FormData(e.target);
   try {
-    await adminApi.post('/api/admin/login', {
+    const { role, username } = await adminApi.post('/api/admin/login', {
       username: fd.get('username'),
       password: fd.get('password'),
     });
+    adminSession = { role, username };
     document.getElementById('login-view').style.display = 'none';
     document.getElementById('dashboard-view').style.display = 'flex';
     initDashboard();
@@ -417,8 +543,9 @@ document.getElementById('admin-login-form').addEventListener('submit', async (e)
 
 (async function bootstrap() {
   try {
-    const { isAdmin } = await adminApi.get('/api/admin/session');
+    const { isAdmin, role, username } = await adminApi.get('/api/admin/session');
     if (isAdmin) {
+      adminSession = { role, username };
       document.getElementById('login-view').style.display = 'none';
       document.getElementById('dashboard-view').style.display = 'flex';
       initDashboard();

@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Profil — Dream Love</title>
-<meta name="theme-color" content="#ff4458" />
+<meta name="theme-color" content="#85386e" />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 <link rel="icon" href="/icons/icon-192.png" />
@@ -12,12 +12,12 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 <body>
-  <div id="page-loader" class="page-loader"><div class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</div></div>
+  <div id="page-loader" class="page-loader"><div class="brand-logo"><img src="/img/logo-plum.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</div></div>
 
   <div class="container profile-page-container" id="profile-page-root" style="display:none">
     <div class="top-bar">
       <button type="button" class="back-btn" id="profile-page-back"><i class="fa-solid fa-arrow-left"></i></button>
-      <a href="/app" class="brand-logo"><img src="/img/logo-red.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
+      <a href="/app" class="brand-logo"><img src="/img/logo-plum.png" class="brand-logo-img" alt="Dream Love" /> Dream Love</a>
       <span style="width:34px"></span>
     </div>
 
@@ -69,7 +69,7 @@
         content.innerHTML = `<div class="empty-state"><p>Profil introuvable.</p></div>`;
         return;
       }
-      content.innerHTML = '<div style="padding:80px 0"><div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(255,68,88,0.2)"></div></div>';
+      content.innerHTML = '<div style="padding:80px 0"><div class="spinner" style="border-top-color:var(--brand-1);border-color:rgba(133,56,110,0.2)"></div></div>';
 
       try {
         const { user } = await api.get(`/api/users/${userId}`);
@@ -98,6 +98,8 @@
             ${user.distanceKm != null ? `<div class="pd-location"><i class="fa-solid fa-location-arrow"></i> À ${user.distanceKm} km</div>` : ''}
             ${user.originCountry ? `<div class="pd-location">${countryFlagEmoji(user.originCountry)} Origine : ${escapeHtml(user.originCountry)}</div>` : ''}
             ${user.relationshipStatus ? `<div class="pd-location"><i class="fa-solid fa-heart-circle-check"></i> ${escapeHtml(relationshipStatusLabel(user.relationshipStatus))}</div>` : ''}
+            ${user.height ? `<div class="pd-location"><i class="fa-solid fa-ruler-vertical"></i> ${heightLabel(user.height)}</div>` : ''}
+            ${user.languages && user.languages.length ? `<div class="pd-location"><i class="fa-solid fa-language"></i> ${escapeHtml(user.languages.join(', '))}</div>` : ''}
             ${user.bio ? `<div class="pd-bio">${escapeHtml(user.bio)}</div>` : ''}
             ${interestsHtml ? `<div class="interest-chips">${interestsHtml}</div>` : ''}
           </div>
